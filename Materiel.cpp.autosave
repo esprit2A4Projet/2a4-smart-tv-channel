@@ -1,0 +1,23 @@
+#include "Materiel.h"
+
+Materiaux::Materiaux()
+{
+    nom="";
+    type="";
+    etat="";
+    quantite="";
+    date="";
+
+}
+void Materiaux::setnom(QString n){nom=n;}
+void Materiaux::settype(QString n){type=n;}
+void Materiaux::setetat(QString n){etat=n;}
+void Materiaux::setquantite(QString n){quantite=n;}
+void Materiaux::setdate(QString n){date=n;}
+
+
+QString Materiaux::get_nom(){return nom;}
+QString Materiaux::get_type(){return type;}
+QString Materiaux::get_etat(){return etat;}
+QString Materiaux::get_quantite(){return quantite;}
+QString Materiaux::get_date(){return date;}
