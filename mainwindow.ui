@@ -405,7 +405,7 @@ border-radius: 12px; /* Adjust the radius for the title bar's corners */
         </rect>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="pushButton_ajouter">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -442,7 +442,7 @@ QPushButton {
         <string>Ajouter</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="pushButton_annuler">
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -620,7 +620,7 @@ QPushButton {
        </property>
       </widget>
      </widget>
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="lineEdit_rechercher">
       <property name="geometry">
        <rect>
         <x>280</x>
@@ -630,7 +630,7 @@ QPushButton {
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_5">
+     <widget class="QPushButton" name="pushButton_rechercher">
       <property name="geometry">
        <rect>
         <x>470</x>

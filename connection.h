@@ -6,11 +6,12 @@
 
 class Connection
 {
-    QSqlDatabase db;
+
 public:
     Connection();
     bool createconnect();
     bool insertData(const QString &nom, const QString &prenom, const QString &profession, const QString &email,const QString &nbAbonnes,const QString &nbParticipation );
+    QSqlDatabase db;
 };
 
 #endif // CONNECTION_H
