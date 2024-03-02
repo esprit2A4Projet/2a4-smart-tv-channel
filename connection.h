@@ -10,7 +10,7 @@ class Connection
 public:
     Connection();
     bool createconnect();
-    bool insertData(const QString &nom, const QString &prenom, const QString &profession, const QString &email,const QString &nbAbonnes,const QString &nbParticipation );
+    bool insertData(const QString &nom, const QString &prenom, const QString &profession, const QString &email, int &nbAbonnes, int &nbParticipation );
     QSqlDatabase db;
 };
 

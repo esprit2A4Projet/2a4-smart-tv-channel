@@ -3,6 +3,7 @@
 #include <QDebug>
 #include "connection.h"
 #include <QMessageBox>
+#include "mainwindow.h"
 
 
 Invite::Invite()
@@ -11,12 +12,10 @@ Invite::Invite()
     prenom="";
     profession="";
     email="";
-    nbAbonnes="";
-    nbParticipation="";
 
 }
 
-Invite::Invite(int id, QString nom, QString prenom, QString profession, QString email, QString nbAbonnes, QString nbParticipation)
+Invite::Invite(int id, QString nom, QString prenom, QString profession, QString email, int nbAbonnes, int nbParticipation)
 {
     this->id=id;
     this->nom=nom;
@@ -32,6 +31,7 @@ bool Invite::ajouterInvite()
     Connection c;
     return c.createconnect() && c.insertData(nom, prenom, profession, email, nbAbonnes, nbParticipation);
 }
+
 
 
 void Invite::afficherInvite(QTableWidget *tableWidget)
@@ -69,7 +69,7 @@ bool Invite::supprimerInvite(int id)
     return query.exec();
 }
 
-bool Invite::modifierInvite(int id, const QString &nom, const QString &prenom, const QString &profession, const QString &email, const QString &nbAbonnes, const QString &nbParticipation)
+bool Invite::modifierInvite(int id, const QString &nom, const QString &prenom, const QString &profession, const QString &email, int &nbAbonnes, int &nbParticipation)
 {
     /*if (!email.contains('@')) {
         QMessageBox::critical(nullptr, "Erreur", "Format d'email invalide.");
@@ -116,4 +116,42 @@ void Invite::rechercherInvite(const QString &searchTerm, QTableWidget *tableWidg
     }
     c.db.close();
 }
+bool Invite::trierParNbAbonnes(QTableWidget *tableWidget)
+{
+    Connection c;
+    if (!c.createconnect()) return false;
 
+    QSqlQuery query(c.db);
+    query.prepare("SELECT * FROM INVITE ORDER BY NBABONNES ASC");
+
+
+    if (query.exec())
+    {
+        tableWidget->clearContents();  // Clear existing contents
+        tableWidget->setRowCount(0);  // Clear existing rows
+
+        tableWidget->setColumnCount(7);
+        tableWidget->setHorizontalHeaderLabels({"ID", "Nom", "Prenom", "Profession", "Email", "Nombre d'abonnes", "Nombre de Participation"});
+
+
+        int RowNumber = 0;
+        while (query.next())
+        {
+            tableWidget->insertRow(RowNumber);
+            for (int col = 0; col < 7; ++col)
+            {
+                QTableWidgetItem *item = new QTableWidgetItem(query.value(col).toString());
+                tableWidget->setItem(RowNumber, col, item);
+            }
+            RowNumber++;
+        }
+
+        c.db.close();
+        return true;
+    }
+    else
+    {
+        c.db.close();
+        return false;
+    }
+}
