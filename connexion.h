@@ -6,12 +6,11 @@
 
 class Connection
 {
-     QSqlDatabase db;
+    QSqlDatabase db;
 public:
     Connection();
-     bool createconnect();
-     void closeConnection();
+    bool createconnect();
+    bool insertData(const QString &modeDePaiement, const QString &type, const QString &categorie, const QString &dateTransaction,const QString &montant);
 };
 
 #endif // CONNECTION_H
-

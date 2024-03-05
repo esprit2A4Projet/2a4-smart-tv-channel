@@ -1,12 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include "connexion.h"
-#include "transaction.h"
-#include <QMainWindow>
-#include <QStandardItemModel>
-#include <QMovie>
-#include <QThread>
 
+#include <QMainWindow>
+#include <QSqlQueryModel>
+#include "transaction.h"
+
+QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
@@ -15,26 +14,32 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
+    void on_pushButton_ajouter_clicked(); //boutton d'ajout
+    void on_pushButton_supprimer_clicked(); // boutton de suppression
+    void on_pushButton_modifier_clicked(); //boutton de modification
+    void updateTableWidget(); // Rename the slot to match the implementation
 
-
-    void on_pushButton_22_clicked();
-
-    void on_pushButton_23_clicked();
-
-    void on_pushButton_67_clicked();
-
-    void on_pushButton_68_clicked();
 
     void on_pushButton_Ajout_clicked();
 
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
+    void on_Button_trierParDate_clicked();
+
+    void on_pushButton_exportationFormatExcel_clicked();
+
+signals:
+    void dataUpdated(); // Declare the dataUpdated signal
 private:
     Ui::MainWindow *ui;
-    Transaction t;
-     QStandardItemModel *model; // Déclaration du modèle ici
+    Transaction Etmp;
+    QSqlQueryModel *model; // Declare a member variable for the model
 };
-#endif // MAINWINDOW_H
 
+#endif // MAINWINDOW_H
