@@ -21,6 +21,7 @@ private slots:
     void on_pushButton_ajouter_clicked();
     void on_pushButton_supprimer_clicked();
     void on_pushButton_modifier_clicked();
+    void on_pushButton_annuler_clicked();
 
 signals:
     void dataUpdated();

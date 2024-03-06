@@ -16,7 +16,7 @@ public:
     Sponsor(int,QString,QString,QString,QString,QString,QString);
 
     //setters
-    void Setid_sponsor(int);
+
     void Setnom(QString );
     void Setbudget(QString );
     void Setpack(QString );
@@ -25,7 +25,7 @@ public:
     void Settelephone(QString );
 
     //getters
-    int Getid_sponsor();
+
     QString Getnom();
     QString Getbudget();
     QString Getpack();

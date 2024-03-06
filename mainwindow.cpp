@@ -27,7 +27,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_ajouter_clicked() // BV
+void MainWindow::on_pushButton_ajouter_clicked()
 {
     Sponsor s;
     s.Setnom(ui->lineEdit_nom->text());
@@ -37,6 +37,11 @@ void MainWindow::on_pushButton_ajouter_clicked() // BV
     s.Setdate_fin(ui->dateEdit_2->text());
     s.Settelephone(ui->lineEdit_tel->text());
 
+    if (s.Getnom().isEmpty() || s.Getbudget().isEmpty() || s.Getpack().isEmpty() ||
+            s.Getdate_deb().isEmpty() || s.Getdate_fin().isEmpty() || s.Gettelephone().isEmpty()) {
+            QMessageBox::critical(this, "Error", "The fields must not be empty.");
+            return; // Exit the function to prevent further execution
+        }
         Connection c;
         if (c.createconnect())
         {
@@ -55,6 +60,20 @@ void MainWindow::on_pushButton_ajouter_clicked() // BV
             QMessageBox::critical(this, "Error", "Failed to connect to the database.");
         }
 }
+
+void MainWindow::on_pushButton_annuler_clicked()
+{
+
+       // Update the UI or clear the input fields if needed
+       ui->lineEdit_nom->clear();
+       ui->lineEdit_budget->clear();
+       ui->lineEdit_pack->clear();
+       ui->dateEdit->clear();
+       ui->dateEdit_2->clear();
+       ui->lineEdit_tel->clear();
+
+}
+
 
 void MainWindow::updateTableWidget()
 {

@@ -5,6 +5,8 @@
 #include <QObject>
 #include <QSqlQueryModel>
 #include <QTableWidget>
+#include <QDate>
+#include <QMessageBox>
 
 Sponsor::Sponsor()
 {
@@ -27,11 +29,6 @@ Sponsor::Sponsor(int id_sponsor, QString nom, QString budget, QString pack, QStr
     this->telephone=telephone;
 }
 
-int Sponsor::Getid_sponsor()
-{ return id_sponsor; }
-
-void Sponsor::Setid_sponsor(int val)
-{ id_sponsor = val; }
 
 QString Sponsor::Getnom()
 { return nom; }
@@ -72,17 +69,51 @@ void Sponsor::Settelephone(QString val)
 
 bool Sponsor::ajouter()
 {
+    // Input validation
+    if (nom.length() > 20) {
+        qDebug() << "Error: Nom should not exceed 20 characters.";
+        return false;
+    }
+
+    bool budgetConversionOk;
+    double budgetValue = budget.toDouble(&budgetConversionOk);
+    if (!budgetConversionOk || budgetValue > 100) {
+        qDebug() << "Error: Budget should be a valid number and not exceed 100.";
+        return false;
+    }
+
+    QStringList validPacks = {"bronze", "silver", "gold"};
+    if (!validPacks.contains(pack.toLower())) {
+        qDebug() << "Error: Pack should be either bronze, silver, or gold.";
+        return false;
+    }
+
+    // Date validation
+    QDate dateDeb = QDate::fromString(date_deb, "yyyy-MM-dd");
+    QDate dateFin = QDate::fromString(date_fin, "yyyy-MM-dd");
+    if (!dateDeb.isValid() || !dateFin.isValid() || dateFin < dateDeb) {
+        qDebug() << "Error: Invalid date range. Date_fin should not be before date_deb.";
+        return false;
+    }
+
+    // Telephone validation
+    if (telephone.length() != 8 || !telephone.toInt()) {
+        qDebug() << "Error: Telephone should be composed of 8 digits.";
+        return false;
+    }
+
+    // If all validations pass, proceed with database insertion
     Connection c;
     QSqlQuery query;
-    if (c.createconnect())
+    if (c.createconnect() and telephone.length()== 8 and telephone.toInt() and dateFin > dateDeb and nom.length() <= 20)
     {
-        return c.insertData(nom,budget,pack,date_deb,date_fin,telephone);
+        return c.insertData(nom, budget, pack, date_deb, date_fin, telephone);
     }
+
     return false;
 }
 
 void Sponsor::afficher(QTableWidget *tableWidget)
-
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
     db.setDatabaseName("Source_Projet2A4");
@@ -91,37 +122,37 @@ void Sponsor::afficher(QTableWidget *tableWidget)
     db.open();
 
     QSqlQuery query(db);
-    QString str=("SELECT * FROM SPONSOR");
+    QString str = ("SELECT NOM, BUDGET, PACK, DATE_DEB, DATE_FIN, TELEPHONE FROM SPONSOR");
     if (query.exec(str))
     {
         tableWidget->setColumnCount(6);
         QStringList labels;
-        labels<<"Nom"<<"Budget"<<"Pack"<<"Date debut"<<"Date fin"<<"Telephone";
+        labels << "Nom" << "Budget" << "Pack" << "Date debut" << "Date fin" << "Telephone";
         tableWidget->setHorizontalHeaderLabels(labels);
-        int RowNumber=0;
-        while(query.next())
+        int RowNumber = 0;
+        while (query.next())
         {
             tableWidget->insertRow(RowNumber);
-            QTableWidgetItem *nom= new QTableWidgetItem;
-            QTableWidgetItem *budget= new QTableWidgetItem;
-            QTableWidgetItem *pack= new QTableWidgetItem;
-            QTableWidgetItem *date_deb= new QTableWidgetItem;
-            QTableWidgetItem *date_fin= new QTableWidgetItem;
-            QTableWidgetItem *telephone= new QTableWidgetItem;
+            QTableWidgetItem *nom = new QTableWidgetItem;
+            QTableWidgetItem *budget = new QTableWidgetItem;
+            QTableWidgetItem *pack = new QTableWidgetItem;
+            QTableWidgetItem *date_deb = new QTableWidgetItem;
+            QTableWidgetItem *date_fin = new QTableWidgetItem;
+            QTableWidgetItem *telephone = new QTableWidgetItem;
 
-            nom->setText(query.value(0).toString());
-            budget->setText(query.value(1).toString());
-            pack->setText(query.value(2).toString());
-            date_deb->setText(query.value(3).toString());
-            date_fin->setText(query.value(4).toString());
-            telephone->setText(query.value(5).toString());
+            nom->setText(query.value("NOM").toString());
+            budget->setText(query.value("BUDGET").toString());
+            pack->setText(query.value("PACK").toString());
+            date_deb->setText(query.value("DATE_DEB").toString());
+            date_fin->setText(query.value("DATE_FIN").toString());
+            telephone->setText(query.value("TELEPHONE").toString());
 
-            tableWidget->setItem(RowNumber,0,nom);
-            tableWidget->setItem(RowNumber,1,budget);
-            tableWidget->setItem(RowNumber,2,pack);
-            tableWidget->setItem(RowNumber,3,date_deb);
-            tableWidget->setItem(RowNumber,4,date_fin);
-            tableWidget->setItem(RowNumber,5,telephone);
+            tableWidget->setItem(RowNumber, 0, nom);
+            tableWidget->setItem(RowNumber, 1, budget);
+            tableWidget->setItem(RowNumber, 2, pack);
+            tableWidget->setItem(RowNumber, 3, date_deb);
+            tableWidget->setItem(RowNumber, 4, date_fin);
+            tableWidget->setItem(RowNumber, 5, telephone);
             RowNumber++;
         }
     }

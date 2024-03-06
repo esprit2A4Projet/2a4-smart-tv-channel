@@ -513,7 +513,7 @@ QPushButton {
         <string>Ajouter</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="pushButton_annuler">
        <property name="geometry">
         <rect>
          <x>140</x>

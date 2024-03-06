@@ -18,7 +18,7 @@ test=true;
     return  test;
 }
 
-void Connection :: closeConnection(){db.close();}
+//void Connection :: closeConnection(){db.close();}
 
 bool Connection::insertData(const QString &nom, const QString &budget, const QString &pack, const QString &date_deb, const QString &date_fin, const QString &telephone)
 {
