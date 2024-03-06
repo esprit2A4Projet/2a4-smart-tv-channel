@@ -1,11 +1,10 @@
 #ifndef SPONSOR_H
 #define SPONSOR_H
-
 #include <QString>
 #include <QSqlQuery>
 #include <QSqlQueryModel>
+#include <QTableWidget>
 
-using namespace std;
 
 
 class Sponsor
@@ -14,28 +13,31 @@ class Sponsor
 public:
     //constructours
     Sponsor();
-    Sponsor(QString,QString,QString,QString,QString);
+    Sponsor(int,QString,QString,QString,QString,QString,QString);
 
-    int Getid_sponsor();
+    //setters
     void Setid_sponsor(int);
-    QString Getnom();
     void Setnom(QString );
-    QString Getbudget();
     void Setbudget(QString );
-    QString Getpack();
     void Setpack(QString );
-    QString Getdate_deb();
     void Setdate_deb(QString );
-    QString Getdate_fin();
     void Setdate_fin(QString );
-    QString Gettelephone();
     void Settelephone(QString );
+
+    //getters
+    int Getid_sponsor();
+    QString Getnom();
+    QString Getbudget();
+    QString Getpack();
+    QString Getdate_deb();
+    QString Getdate_fin();
+    QString Gettelephone();
 
     //fonctionnet crud
     bool ajouter();
-    QSqlQueryModel  * afficher();
+    void afficher(QTableWidget *tableWidget);
     bool supprimer(int);
-
+    bool modifier(int id_sponsor, const QString &nom, const QString &budget, const QString &pack, const QString &date_deb, const QString &date_fin, const QString &telephone);
 
 
 private:

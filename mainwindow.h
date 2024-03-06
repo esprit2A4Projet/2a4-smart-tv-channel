@@ -2,9 +2,8 @@
 #define MAINWINDOW_H
 #include "sponsor.h"
 #include <QMainWindow>
-#include <QStandardItemModel>
-#include <QMovie>
-#include <QThread>
+#include <QSqlQueryModel>
+
 namespace Ui {
 class MainWindow;
 }
@@ -17,16 +16,17 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void updateTableWidget();
     void on_pushButton_ajouter_clicked();
-
     void on_pushButton_supprimer_clicked();
-
     void on_pushButton_modifier_clicked();
 
+signals:
+    void dataUpdated();
 private:
     Ui::MainWindow *ui;
-    Sponsor s;
-    QStandardItemModel *model;
+    QSqlQueryModel *model;
 };
 
 #endif // MAINWINDOW_H
