@@ -34,6 +34,10 @@ private slots:
 
     void on_pushButton_exportationFormatExcel_clicked();
 
+    void on_Button_filtrer_2_clicked();
+
+    void on_Button_chercherParID_clicked();
+
 signals:
     void dataUpdated(); // Declare the dataUpdated signal
 private:

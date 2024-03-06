@@ -236,8 +236,6 @@ void MainWindow::on_Button_trierParDate_clicked() //tri par date
                 row++;
             }
         }
-
-        db.close();
 }
 
 
@@ -265,5 +263,76 @@ void MainWindow::on_pushButton_exportationFormatExcel_clicked()
             } else {
                 QMessageBox::critical(this, "Export Error", "Failed to open the file for writing.");
             }
+        }
+}
+
+void MainWindow::on_Button_filtrer_2_clicked() //tri par montant
+{
+    ui->tableWidget->clearContents(); // Efface le contenu actuel du tableau
+        ui->tableWidget->setRowCount(0); // Efface également les lignes existantes du tableau
+        // Trier les transactions par montant
+        QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+        db.setDatabaseName("Source_Projet2A4");
+        db.setUserName("system");
+        db.setPassword("Islemsallouma1");
+        db.open();
+        QSqlQuery query(db);
+        QString str = ("SELECT * FROM TRANSACTION");
+        if (query.exec(str))
+        {
+            ui->tableWidget->setColumnCount(6);
+            QStringList labels;
+            labels << "Mode de paiement" << "Type" << "Categorie" << "Date de transaction" << "Montant" << "ID";
+            ui->tableWidget->setHorizontalHeaderLabels(labels);
+            int row = 0;
+            QVector<QPair<double, QStringList>> sortedTransactions; // Pour stocker les transactions triées par montant
+
+            while (query.next())
+            {
+                QStringList transactionData;
+                transactionData << query.value(0).toString() << query.value(1).toString() << query.value(2).toString() << query.value(3).toString() << query.value(4).toString() << query.value(5).toString();
+                double montant = query.value(4).toDouble(); // Obtenez le montant en double
+                sortedTransactions.append(qMakePair(montant, transactionData));
+            }
+
+            // Tri des transactions par montant
+            std::sort(sortedTransactions.begin(), sortedTransactions.end(), [](const QPair<double, QStringList> &a, const QPair<double, QStringList> &b) {
+                return a.first < b.first;
+            });
+
+            // Affichage des transactions triées dans le tableau
+            for (const auto &transaction : sortedTransactions)
+            {
+                ui->tableWidget->insertRow(row);
+                for (int col = 0; col < 6; ++col)
+                {
+                    QTableWidgetItem *item = new QTableWidgetItem(transaction.second[col]);
+                    ui->tableWidget->setItem(row, col, item);
+                }
+                row++;
+            }
+        }
+
+}
+
+void MainWindow::on_Button_chercherParID_clicked()
+{
+    QString idToSearch = ui->lineEdit_RechercheParID->text(); // Récupère l'ID à rechercher depuis le lineEdit
+
+        bool found = false; // Indique si l'ID a été trouvé
+
+        // Parcours des lignes du tableau pour trouver l'ID correspondant
+        for (int row = 0; row < ui->tableWidget->rowCount(); ++row) {
+            QTableWidgetItem *item = ui->tableWidget->item(row, 5); // Récupère l'item de la colonne d'ID (index 5)
+            if (item && item->text() == idToSearch) { // Vérifie si l'item existe et s'il correspond à l'ID recherché
+                ui->tableWidget->selectRow(row); // Sélectionne la ligne correspondante dans le tableau
+                found = true; // Marque l'ID comme trouvé
+                break; // Sort de la boucle car l'ID a été trouvé
+            }
+        }
+
+        // Si l'ID n'a pas été trouvé, affiche un message d'erreur
+        if (!found) {
+            QMessageBox::critical(this, "Erreur", "L'ID spécifié n'existe pas dans la table.");
         }
 }

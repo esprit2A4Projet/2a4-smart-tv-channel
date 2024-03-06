@@ -813,7 +813,7 @@ QPushButton {
        <string>Supprimer</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="Button_filtrer_2">
+     <widget class="QPushButton" name="Button_TrierParMontant">
       <property name="geometry">
        <rect>
         <x>710</x>
