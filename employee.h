@@ -32,9 +32,10 @@ bool ajouter();
 QSqlQueryModel * afficher();
 bool supprimer(int );
 bool update(int);
+QSqlQueryModel* Rechercher(int );
+QSqlQueryModel* tri();
 
-
-
+void genererPDFact();
 };
 
 #endif // EMPLOYEE_H

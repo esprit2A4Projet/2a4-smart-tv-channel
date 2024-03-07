@@ -1,5 +1,7 @@
 QT       += core gui  sql
 QT += sql
+QT += core gui printsupport
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -45,4 +47,5 @@ RESOURCES += \
     logo.qrc \
     logoo.qrc \
     photo.qrc \
-    stat.qrc
+    stat.qrc \
+    tri.qrc

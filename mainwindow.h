@@ -29,6 +29,19 @@ private slots:
 
     void on_pushButton_68_clicked();
 
+    void on_pushButton_10_clicked();
+
+
+    void on_pushButton_69_clicked();
+
+    void on_pushButton_70_clicked();
+
+    void on_comboBox_activated(const QString &arg1);
+
+    void on_pushButton_92_clicked();
+
+    void on_pushButton_71_clicked();
+
 private:
     Ui::MainWindow *ui;
     Employee e;

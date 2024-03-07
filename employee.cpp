@@ -3,10 +3,17 @@
 #include <QDebug>
 #include <QObject>
 #include <QSqlQueryModel>
-
+#include <QSqlQuery>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QDesktopServices>
+#include <QPdfWriter>
+#include <QPainter>
+#include <QPrinter>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QTextDocument>
 Employee::Employee()
 {
 id=0;
@@ -43,7 +50,8 @@ int Employee::get_salaire(){return salaire;}
 QString Employee::get_poste(){return poste;}
 
 
-bool Employee::ajouter(){
+bool Employee::ajouter()
+{
        QSqlQuery query;
 
              query.prepare("INSERT INTO EMPLOYES (nom, prenom, date_embauche,salaire,poste) "
@@ -55,10 +63,11 @@ bool Employee::ajouter(){
              query.bindValue(4,poste);
 
         return query.exec();
-    }
+}
 
 
-QSqlQueryModel* Employee::afficher(){
+QSqlQueryModel* Employee::afficher()
+{
    QSqlQueryModel* model=new QSqlQueryModel();
 
          model->setQuery("SELECT* FROM EMPLOYES");
@@ -82,7 +91,8 @@ bool Employee::supprimer(int id)
             return query.exec();
 }
 
-bool Employee::update(int id) {
+bool Employee::update(int id)
+{
     QSqlQuery query;
     // Exécuter la mise à jour avec les nouvelles valeurs des attributs de l'employé
     query.prepare("UPDATE EMPLOYES SET NOM=:nom, PRENOM=:prenom, date_embauche=:date_embauche, Salaire=:salaire, poste=:poste WHERE id=:id");
@@ -93,7 +103,8 @@ bool Employee::update(int id) {
     query.bindValue(":poste", poste);
     query.bindValue(":id", id);
 
-    if (!query.exec()) {
+    if (!query.exec())
+    {
         qDebug() << "Update operation failed.";
         return false; // Return false if the update operation fails
     }
@@ -104,3 +115,60 @@ else
 }
 
 
+
+
+
+
+
+
+
+QSqlQueryModel* Employee::Rechercher(int id)
+{
+    QSqlQueryModel *model = new QSqlQueryModel;
+    QSqlQuery query;
+
+    // Préparer la requête SQL avec un paramètre lié à l'ID
+    query.prepare("SELECT * FROM EMPLOYES WHERE id = :id");
+    query.bindValue(":id", id); // Lier la valeur de l'ID à la requête
+
+    // Exécuter la requête et vérifier si elle a réussi
+    if (query.exec()) {
+        // Si la requête réussit, associer le modèle à la requête
+        model->setQuery(query);
+    } else {
+        // Si la requête échoue, afficher un message d'erreur et détruire le modèle
+        qDebug() << "Erreur lors de l'exécution de la requête SQL:" << query.lastError().text();
+        delete model;
+        model = nullptr;
+    }
+
+    return model;
+}
+
+
+
+QSqlQueryModel* Employee::tri()
+{
+   QSqlQueryModel * model=new QSqlQueryModel();
+   model->setQuery("SELECT * FROM EMPLOYES ORDER BY prenom ASC ");
+
+   model->setHeaderData(0,Qt::Horizontal,QObject::tr("id"));
+   model->setHeaderData(1,Qt::Horizontal,QObject::tr("nom"));
+   model->setHeaderData(2,Qt::Horizontal,QObject::tr("prenom"));
+   model->setHeaderData(3,Qt::Horizontal,QObject::tr("date d'embauche"));
+   model->setHeaderData(4,Qt::Horizontal,QObject::tr("salaire"));
+   model->setHeaderData(5,Qt::Horizontal,QObject::tr("poste"));
+
+
+   return  model;
+
+}
+
+
+
+void Employee::genererPDFact()
+{
+
+
+
+}
