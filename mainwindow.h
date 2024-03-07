@@ -24,6 +24,7 @@ private slots:
     void on_pushButton_annuler_clicked();
     void on_pushButton_rechercher_clicked();
     void on_pushButton_trier_clicked();
+    void on_pushButton_exporter_clicked();
     void updateTableWidget(const QString &filter); // Rename the slot to match the implementation
     void showCustomMessageBox(const QString &title, const QString &message, QMessageBox::Icon icon);
 signals:

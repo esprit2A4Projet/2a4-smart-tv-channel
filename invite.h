@@ -36,6 +36,7 @@ public:
     //Fonctionnalites
     void rechercherInvite(const QString &searchTerm, QTableWidget *tableWidget);
     bool trierParNbAbonnes(QTableWidget *tableWidget);
+    bool exportToPDF(const QString &filePath, QTableWidget *tableWidget);
 private:
     int id,nbAbonnes,nbParticipation;
     QString nom,prenom,profession,email;

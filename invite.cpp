@@ -4,6 +4,14 @@
 #include "connection.h"
 #include <QMessageBox>
 #include "mainwindow.h"
+#include <QPrinter>
+#include <QPainter>
+#include <QFileDialog>
+#include <QTextDocument>
+#include <QTextCursor>
+#include <QTextTable>
+#include <QTextTableCell>
+#include <QTextTableFormat>
 
 
 Invite::Invite()
@@ -154,4 +162,30 @@ bool Invite::trierParNbAbonnes(QTableWidget *tableWidget)
         c.db.close();
         return false;
     }
+}
+bool Invite::exportToPDF(const QString &filePath, QTableWidget *tableWidget)
+{
+    // Create a printer
+    QPrinter printer;
+
+    // Set printer properties
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(filePath);
+
+    // Create a painter
+    QPainter painter(&printer);
+
+    // Set painter properties
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
+    // Begin painting
+    painter.begin(&printer);
+
+    // Draw the table contents
+    tableWidget->render(&painter);
+
+    // End painting
+    painter.end();
+
+    return true;
 }

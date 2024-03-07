@@ -3,6 +3,7 @@
 #include "invite.h"
 #include "connection.h"
 #include <QMessageBox>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
    : QMainWindow(parent),
@@ -278,5 +279,22 @@ void MainWindow::on_pushButton_trier_clicked()
         showCustomMessageBox("Success", "Data sorted by Nombre d'abonnes.", QMessageBox::Information);
     } else {
         showCustomMessageBox("Error", "Failed to sort data.", QMessageBox::Critical);
+    }
+}
+void MainWindow::on_pushButton_exporter_clicked()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, "Save PDF", "", "PDF Files (*.pdf)");
+
+    if (!filePath.isEmpty())
+    {
+        Invite i;
+        if (i.exportToPDF(filePath, ui->tableWidget))
+        {
+            showCustomMessageBox("Success", "Table exported to PDF.", QMessageBox::Information);
+        }
+        else
+        {
+            showCustomMessageBox("Error", "Failed to export table to PDF.", QMessageBox::Critical);
+        }
     }
 }

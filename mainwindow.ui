@@ -760,7 +760,7 @@ background-position: center;
 </string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_4">
+     <widget class="QPushButton" name="pushButton_exporter">
       <property name="geometry">
        <rect>
         <x>310</x>
