@@ -69,43 +69,9 @@ void Sponsor::Settelephone(QString val)
 
 bool Sponsor::ajouter()
 {
-    // Input validation
-    if (nom.length() > 20) {
-        qDebug() << "Error: Nom should not exceed 20 characters.";
-        return false;
-    }
-
-    bool budgetConversionOk;
-    double budgetValue = budget.toDouble(&budgetConversionOk);
-    if (!budgetConversionOk || budgetValue > 100) {
-        qDebug() << "Error: Budget should be a valid number and not exceed 100.";
-        return false;
-    }
-
-    QStringList validPacks = {"bronze", "silver", "gold"};
-    if (!validPacks.contains(pack.toLower())) {
-        qDebug() << "Error: Pack should be either bronze, silver, or gold.";
-        return false;
-    }
-
-    // Date validation
-    QDate dateDeb = QDate::fromString(date_deb, "yyyy-MM-dd");
-    QDate dateFin = QDate::fromString(date_fin, "yyyy-MM-dd");
-    if (!dateDeb.isValid() || !dateFin.isValid() || dateFin < dateDeb) {
-        qDebug() << "Error: Invalid date range. Date_fin should not be before date_deb.";
-        return false;
-    }
-
-    // Telephone validation
-    if (telephone.length() != 8 || !telephone.toInt()) {
-        qDebug() << "Error: Telephone should be composed of 8 digits.";
-        return false;
-    }
-
-    // If all validations pass, proceed with database insertion
     Connection c;
     QSqlQuery query;
-    if (c.createconnect() and telephone.length()== 8 and telephone.toInt() and dateFin > dateDeb and nom.length() <= 20)
+    if (c.createconnect())
     {
         return c.insertData(nom, budget, pack, date_deb, date_fin, telephone);
     }
@@ -184,7 +150,80 @@ bool Sponsor::modifier(int id_sponsor, const QString &nom, const QString &budget
     query.bindValue(":date_deb", date_deb);
     query.bindValue(":date_fin", date_fin);
     query.bindValue(":telephone", telephone);
+    query.bindValue(":id_sponsor",id_sponsor);
+    if (!query.exec())
+    {
+        qDebug() << "Erreur de mise a jour : " << query.lastError().text();
+        return false;
+    }
+    return true;
+}
 
-    return query.exec();
+void Sponsor::rechercher(int id_sponsor, QTableWidget *tableWidget)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName("Source_Projet2A4");
+    db.setUserName("amine");
+    db.setPassword("amine");
+    db.open();
+
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM SPONSOR WHERE ID_SPONSOR = :id_sponsor");
+    query.bindValue(":id_sponsor", id_sponsor);
+
+    if (query.exec())
+    {
+        tableWidget->clear(); // Clear existing content before populating with search results
+        tableWidget->setColumnCount(6);
+        tableWidget->setHorizontalHeaderLabels({"Nom", "Budget", "Pack", "Date debut", "Date fin", "Telephone"});
+
+        int RowNumber = 0;
+        while (query.next())
+        {
+            tableWidget->insertRow(RowNumber);
+            for (int col = 0; col < 6; ++col)
+            {
+                QTableWidgetItem *item = new QTableWidgetItem(query.value(col).toString());
+                tableWidget->setItem(RowNumber, col, item);
+            }
+            RowNumber++;
+        }
+    }
+    else
+    {
+        qDebug() << "Error executing query: " << query.lastError().text();
+    }
+
+    db.close();
+}
+
+bool Sponsor::trierParPack(QTableWidget *tableWidget)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName("Source_Projet2A4");
+    db.setUserName("amine");
+    db.setPassword("amine");
+    db.open();
+
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM SPONSOR ORDER BY PACK ASC");
+
+
+    if (query.exec())
+    {
+        tableWidget->setSortingEnabled(true);
+        tableWidget->sortByColumn(2, Qt::AscendingOrder);  // Assuming "Pack" is the third column (index 2)
+
+            // Optional: You can reset the sorting mode if needed
+            // tableWidget->setSortingEnabled(false);
+
+        db.close();
+        return true;
+    }
+    else
+    {
+        db.close();
+        return false;
+    }
 }
 
