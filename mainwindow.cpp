@@ -54,35 +54,36 @@ void MainWindow::on_pushButton_ajouter_clicked()
             return; // Exit the function to prevent further execution
         }
     // Input validation
-        if (s.Getnom().length() > 20) {
-            QMessageBox::critical(this, "Error", "Nom should not exceed 20 characters.");
+        QRegExp rx("^[a-zA-Z]+$");
+        if (s.Getnom().length() > 20 || !rx.exactMatch(s.Getnom())) {
+            QMessageBox::critical(this, "Error", "Le nom ne doit pas dépasser 20 caractères et doit être aplphabétique.");
             return;
         }
 
         bool budgetConversionOk;
         double budgetValue = s.Getbudget().toDouble(&budgetConversionOk);
         if (!budgetConversionOk || s.Getbudget().length() > 20) {
-            QMessageBox::critical(this, "Error", "Budget should be a valid number.");
+            QMessageBox::critical(this, "Error", "Le budget doit être un nombre valide.");
             return;
         }
 
         QStringList validPacks = {"bronze", "silver", "gold"};
         if (!validPacks.contains(s.Getpack().toLower())) {
-            QMessageBox::critical(this, "Error", "Pack should be either bronze, silver, or gold.");
+            QMessageBox::critical(this, "Error", "Le pack doit être en bronze, en argent ou en or.");
             return;
         }
 
         // Date validation
-        QDate dateDeb = QDate::fromString(s.Getdate_deb(), "dd-MM-yyyy");
-        QDate dateFin = QDate::fromString(s.Getdate_fin(), "dd-MM-yyyy");
-        if (!dateDeb.isValid() || !dateFin.isValid() || dateFin < dateDeb) {
-            QMessageBox::critical(this, "Error", "Invalid date range. Date_fin should not be before date_deb.");
+        QDate dateDeb = ui->dateEdit->date();
+        QDate dateFin = ui->dateEdit_2->date();
+        if (dateFin < dateDeb) {
+            QMessageBox::critical(this, "Error", "Plage de dates non valide. Date_fin ne devrait pas l’être avant date_deb.");
             return;
         }
 
         // Telephone validation
         if (s.Gettelephone().length() != 8 || !s.Gettelephone().toInt()) {
-            QMessageBox::critical(this, "Error", "Telephone should be composed of 8 digits.");
+            QMessageBox::critical(this, "Error", "Le téléphone doit être composé de 8 chiffres.");
             return;
         }
 
@@ -188,6 +189,47 @@ void MainWindow::on_pushButton_modifier_clicked()
         QString date_fin = ui->tableWidget->item(row, 5)->text();
         QString telephone = ui->tableWidget->item(row, 6)->text();
 
+        // Contrôles de saisie
+        if (nom.isEmpty() || budget.isEmpty() || pack.isEmpty() ||
+                date_deb.isEmpty() || date_fin.isEmpty() || telephone.isEmpty()) {
+            QMessageBox::critical(this, "Error", "Les champs ne doivent pas être vides.");
+            return;
+        }
+
+        // Validation des saisies
+        QRegExp rx("^[a-zA-Z]+$");
+        if (nom.length() > 20 || !rx.exactMatch(nom)) {
+            QMessageBox::critical(this, "Error", "Le nom ne doit pas dépasser 20 caractères et doit être alphabétique.");
+            return;
+        }
+
+        bool budgetConversionOk;
+        double budgetValue = budget.toDouble(&budgetConversionOk);
+        if (!budgetConversionOk || budget.length() > 20) {
+            QMessageBox::critical(this, "Error", "Le budget doit être un nombre valide.");
+            return;
+        }
+
+        QStringList validPacks = {"bronze", "silver", "gold"};
+        if (!validPacks.contains(pack.toLower())) {
+            QMessageBox::critical(this, "Error", "Le pack doit être en bronze, en argent ou en or.");
+            return;
+        }
+
+        // Date validation
+        QDate dateDeb = QDate::fromString(date_deb, "dd/MM/yyyy");
+        QDate dateFin = QDate::fromString(date_fin, "dd/MM/yyyy");
+        if (!dateDeb.isValid() || !dateFin.isValid() || dateFin < dateDeb) {
+            QMessageBox::critical(this, "Error", "Plage de dates non valide. Date_fin ne devrait pas l’être avant date_deb.");
+            return;
+        }
+
+        // Telephone validation
+        if (telephone.length() != 8 || !telephone.toInt()) {
+            QMessageBox::critical(this, "Error", "Le téléphone doit être composé de 8 chiffres.");
+            return;
+        }
+
         // Appelez la fonction modifierInvite pour mettre à jour la base de données
         Sponsor s;
         if (s.modifier(idToModify, nom, budget, pack, date_deb, date_fin, telephone))
@@ -201,16 +243,25 @@ void MainWindow::on_pushButton_modifier_clicked()
             ui->tableWidget->setItem(row, 6, new QTableWidgetItem(telephone));
 
             emit dataUpdated(); // Mettre à jour la vue après la modification
-            QMessageBox::information(this, "Success", "Data modified in the database.");
+            QMessageBox::information(this, "Success", "Données modifiées dans la base de données.");
         }
         else
         {
-            QMessageBox::critical(this, "Error", "Failed to modify data in the database.");
+            QMessageBox::critical(this, "Error", "Échec de la modification des données dans la base de données.");
         }
     } else {
-        QMessageBox::warning(this, "Warning", "Please select a row to modify.");
+        QMessageBox::warning(this, "Warning", "Veuillez sélectionner une ligne à modifier.");
     }
 }
+
+
+
+void MainWindow::on_pushButton_reset_clicked()
+{
+    Sponsor s;
+    s.afficher(ui->tableWidget);
+}
+
 
 void MainWindow::on_pushButton_rechercher_clicked()
 {
@@ -221,6 +272,7 @@ void MainWindow::on_pushButton_rechercher_clicked()
     {
         // Perform the search by id_sponsor
         Sponsor s;
+        emit dataUpdated();
         s.rechercher(id_sponsor, ui->tableWidget);
 
     }
@@ -244,61 +296,62 @@ void MainWindow::on_pushButton_trier_clicked()
 void MainWindow::on_PDF_clicked()
 {
     QString strStream;
-      QTextStream out(&strStream);
+    QTextStream out(&strStream);
 
-      const int rowCount = ui->tableWidget->rowCount();
-      const int columnCount = ui->tableWidget->columnCount();
+    const int rowCount = ui->tableWidget->rowCount();
+    const int columnCount = ui->tableWidget->columnCount();
 
-      out <<  "<html>\n"
-          "<head>\n"
-          "<meta Content=\"Text/html; charset=Windows-1251\">\n"
-          <<  QString("<title>%1</title>\n").arg("Liste des sponsors")
-          <<  "</head>\n"
-          "<body bgcolor=#ffffff link=#5000A0>\n"
-          "<center> <H1>Liste Des Sponsors </H1></br></br><table border=1 cellspacing=0 cellpadding=2>\n";
+    out << "<html>\n"
+           "<head>\n"
+           "<meta Content=\"Text/html; charset=Windows-1251\">\n"
+           << QString("<title>%1</title>\n").arg("Liste des sponsors")
+           << "</head>\n"
+              "<body bgcolor=#ffffff link=#5000A0>\n"
+              "<center> <H1>Liste Des Sponsors </H1></br></br><table border=1 cellspacing=0 cellpadding=2>\n";
 
-      // headers
-      out << "<thead><tr bgcolor=#f0f0f0> <th>Numero</th>";
-      for (int column = 0; column < columnCount; column++)
-          if (!ui->tableWidget->isColumnHidden(column))
-              out << QString("<th>%1</th>").arg(ui->tableWidget->horizontalHeaderItem(column)->text());
-      out << "</tr></thead>\n";
+    // headers
+    out << "<thead><tr bgcolor=#f0f0f0> <th>Numero</th>";
+    for (int column = 1; column < columnCount; column++)
+        if (!ui->tableWidget->isColumnHidden(column))
+            out << QString("<th>%1</th>").arg(ui->tableWidget->horizontalHeaderItem(column)->text());
+    out << "</tr></thead>\n";
 
-      // data table
-      for (int row = 0; row < rowCount; row++)
-      {
-          out << "<tr> <td bkcolor=0>" << row + 1 << "</td>";
-          for (int column = 0; column < columnCount; column++)
-          {
-              if (!ui->tableWidget->isColumnHidden(column))
-              {
-                  QTableWidgetItem *item = ui->tableWidget->item(row, column);
-                  QString data = (item) ? item->text().simplified() : QString("&nbsp;");
-                  out << QString("<td bkcolor=0>%1</td>").arg((!data.isEmpty()) ? data : QString("&nbsp;"));
-              }
-          }
-          out << "</tr>\n";
-      }
-      out <<  "</table> </center>\n"
-          "</body>\n"
-          "</html>\n";
+    // data table
+    for (int row = 0; row < rowCount; row++)
+    {
+        out << "<tr> <td bkcolor=0>" << row + 1 << "</td>";
+        for (int column = 1; column < columnCount; column++)
+        {
+            if (!ui->tableWidget->isColumnHidden(column))
+            {
+                QTableWidgetItem *item = ui->tableWidget->item(row, column);
+                QString data = (item) ? item->text().simplified() : QString("&nbsp;");
+                out << QString("<td bkcolor=0>%1</td>").arg((!data.isEmpty()) ? data : QString("&nbsp;"));
+            }
+        }
+        out << "</tr>\n";
+    }
+    out << "</table> </center>\n"
+           "</body>\n"
+           "</html>\n";
 
-      QString fileName = QFileDialog::getSaveFileName((QWidget * )0, "Sauvegarder en PDF", QString(), "*.pdf");
-      if (QFileInfo(fileName).suffix().isEmpty())
-      {
-          fileName.append(".pdf");
-      }
+    QString fileName = QFileDialog::getSaveFileName((QWidget *)0, "Sauvegarder en PDF", QString(), "*.pdf");
+    if (QFileInfo(fileName).suffix().isEmpty())
+    {
+        fileName.append(".pdf");
+    }
 
-      QPrinter printer (QPrinter::PrinterResolution);
-      printer.setOutputFormat(QPrinter::PdfFormat);
-      printer.setPaperSize(QPrinter::A4);
-      printer.setOutputFileName(fileName);
+    QPrinter printer(QPrinter::PrinterResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setPaperSize(QPrinter::A4);
+    printer.setOutputFileName(fileName);
 
-      QTextDocument doc;
-      doc.setHtml(strStream);
-      doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
-      doc.print(&printer);
+    QTextDocument doc;
+    doc.setHtml(strStream);
+    doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
+    doc.print(&printer);
 }
+
 
 
 /*

@@ -25,6 +25,7 @@ private slots:
     void on_pushButton_rechercher_clicked();
     void on_pushButton_trier_clicked();
     void on_PDF_clicked();
+    void on_pushButton_reset_clicked();
 
 signals:
     void dataUpdated();

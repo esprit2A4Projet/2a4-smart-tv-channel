@@ -212,7 +212,7 @@ bool Sponsor::trierParPack(QTableWidget *tableWidget)
     if (query.exec())
     {
         tableWidget->setSortingEnabled(true);
-        tableWidget->sortByColumn(2, Qt::AscendingOrder);  // Assuming "Pack" is the third column (index 2)
+        tableWidget->sortByColumn(3, Qt::AscendingOrder);
 
             // Optional: You can reset the sorting mode if needed
             // tableWidget->setSortingEnabled(false);

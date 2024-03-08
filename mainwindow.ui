@@ -63,6 +63,9 @@ border-radius: 10px; /* Adjust the radius for the rounded corners */
         <height>22</height>
        </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius: 19px; </string>
+      </property>
       <item>
        <property name="text">
         <string>Budget</string>
@@ -152,7 +155,7 @@ background-position: center;</string>
        <string>Trier par</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="lineEdit_rechercher">
       <property name="geometry">
        <rect>
         <x>290</x>
@@ -160,6 +163,9 @@ background-position: center;</string>
         <width>151</width>
         <height>22</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius: 19px; </string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_supprimer">
@@ -199,7 +205,7 @@ QPushButton {
        <string>Supprimer</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_5">
+     <widget class="QPushButton" name="pushButton_rechercher">
       <property name="geometry">
        <rect>
         <x>470</x>
@@ -236,7 +242,7 @@ QPushButton {
        <string>Chercher</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_3">
+     <widget class="QPushButton" name="pushButton_trier">
       <property name="geometry">
        <rect>
         <x>840</x>
@@ -289,7 +295,7 @@ border-radius: 20px;
 background-position: center;</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_4">
+     <widget class="QPushButton" name="PDF">
       <property name="geometry">
        <rect>
         <x>280</x>
@@ -619,6 +625,9 @@ QPushButton {
          <height>22</height>
         </rect>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
       </widget>
       <widget class="QDateEdit" name="dateEdit_2">
        <property name="geometry">
@@ -776,6 +785,43 @@ QTableWidget::item, QHeaderView::section {
         <string>Telephone</string>
        </property>
       </column>
+     </widget>
+     <widget class="QPushButton" name="pushButton_reset">
+      <property name="geometry">
+       <rect>
+        <x>720</x>
+        <y>510</y>
+        <width>51</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Space Grotesk</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}
+/* Push Button Styling */
+QPushButton {
+    background-color: #E8E8FD; /* Set the background color for the push button */
+    border: 2px solid #D1D0FB; /* Set the border color */
+    border-radius: 10px; /* Adjust the radius for the rounded corners */
+    color: #000000; /* Set the text color */
+    font-family: &quot;Space Grotesk&quot;;
+
+}
+
+
+</string>
+      </property>
+      <property name="text">
+       <string>Reset</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
