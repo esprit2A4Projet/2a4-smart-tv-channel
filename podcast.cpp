@@ -1,0 +1,143 @@
+#include "podcast.h"
+#include "connection.h"
+#include <QDebug>
+#include <QObject>
+#include <QSqlQueryModel>
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+podcast::podcast()
+{
+    id=0;
+    nom="";
+    duree="";
+    lieu="";
+    categorie="";
+    date_pod="";
+
+}
+
+podcast::podcast(QString a,QString b,QString c,QString d,QString e)
+{
+    nom=a;
+    duree=b;
+    lieu=c;
+    categorie=d;
+    date_pod=e;
+
+}
+
+void podcast::setnom(QString n){nom=n;}
+void podcast::setduree(QString n){duree=n;}
+void podcast::setlieu(QString n){lieu=n;}
+void podcast::setcategorie(QString n){categorie=n;}
+void podcast::setdate_pod(QString n){date_pod=n;}
+
+
+int podcast::get_id(){return id;}
+QString podcast::get_nom(){return nom;}
+QString podcast::get_duree(){return duree;}
+QString podcast::get_lieu(){return lieu;}
+QString podcast::get_categorie(){return categorie;}
+QString podcast::get_date_pod(){return date_pod;}
+
+
+bool podcast::ajouter(){
+       QSqlQuery query;
+
+             query.prepare("INSERT INTO PODCASTS (nom, duree, lieu,categorie,date_pod) "
+                        "VALUES (:nom, :duree, :lieu,:categorie,:date_pod)");
+             query.bindValue(0,nom);
+             query.bindValue(1,duree);
+             query.bindValue(2,lieu);
+             query.bindValue(3,categorie);
+             query.bindValue(4,date_pod);
+
+        return query.exec();
+    }
+
+
+QSqlQueryModel* podcast::afficher(){
+   QSqlQueryModel* model=new QSqlQueryModel();
+
+         model->setQuery("SELECT* FROM PODCASTS");
+         model->setHeaderData(0, Qt::Horizontal, QObject::tr("Identifiant"));
+         model->setHeaderData(1, Qt::Horizontal, QObject:: tr("Nom"));
+         model->setHeaderData(2, Qt::Horizontal, QObject:: tr("duree"));
+         model->setHeaderData(3, Qt::Horizontal, QObject:: tr("lieu"));
+         model->setHeaderData(4, Qt::Horizontal, QObject:: tr("categorie"));
+         model->setHeaderData(5, Qt::Horizontal, QObject:: tr("date_pod"));
+
+ return model;
+}
+
+bool podcast::supprimer(int id)
+{
+
+    QSqlQuery query;
+           query.prepare("Delete from PODCASTS where id_podcast=:id");
+           query.bindValue(0, id);
+            return query.exec();
+}
+
+
+// Dans podcast.cpp
+bool podcast::update(int id, const QString& nom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod)
+{
+    QSqlQuery query;
+    query.prepare("UPDATE PODCASTS SET nom = :nom, duree = :duree, lieu = :lieu, categorie = :categorie, date_pod = :date_pod WHERE id_podcast = :id");
+    query.bindValue(":nom", nom);
+    query.bindValue(":duree", duree);
+    query.bindValue(":lieu", lieu);
+    query.bindValue(":categorie", categorie);
+    query.bindValue(":date_pod", date_pod);
+    query.bindValue(":id", id);
+
+    if (query.exec()) {
+        return true; // La modification a réussi
+    } else {
+        qDebug() << "Erreur de mise à jour du podcast:" << query.lastError().text();
+        return false; // La modification a échoué
+    }
+}
+
+QSqlQueryModel* podcast::Rechercher(int id)
+{
+    QSqlQueryModel *model = new QSqlQueryModel;
+    QSqlQuery query;
+
+    // Préparer la requête SQL avec un paramètre lié à l'ID
+    query.prepare("SELECT * FROM PODCASTS WHERE id = :id");
+    query.bindValue(":id", id); // Lier la valeur de l'ID à la requête
+
+    // Exécuter la requête et vérifier si elle a réussi
+    if (query.exec()) {
+        // Si la requête réussit, associer le modèle à la requête
+        model->setQuery(query);
+    } else {
+        // Si la requête échoue, afficher un message d'erreur et détruire le modèle
+        qDebug() << "Erreur lors de l'exécution de la requête SQL:" << query.lastError().text();
+        delete model;
+        model = nullptr;
+    }
+
+    return model;
+}
+
+QSqlQueryModel* podcast::tri()
+{
+   QSqlQueryModel * model=new QSqlQueryModel();
+   model->setQuery("SELECT * FROM PODCASTS ORDER BY date_pod ASC ");
+
+   model->setHeaderData(0,Qt::Horizontal,QObject::tr("id"));
+   model->setHeaderData(1,Qt::Horizontal,QObject::tr("nom"));
+   model->setHeaderData(2,Qt::Horizontal,QObject::tr("duree"));
+   model->setHeaderData(3,Qt::Horizontal,QObject::tr("lieu"));
+   model->setHeaderData(4,Qt::Horizontal,QObject::tr("categorie"));
+   model->setHeaderData(5,Qt::Horizontal,QObject::tr("date_pod"));
+
+
+   return  model;
+
+}
+
