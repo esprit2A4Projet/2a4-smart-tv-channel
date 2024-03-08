@@ -7,7 +7,7 @@
 class Materiaux
 {
 public:
-    void setid(QString n);
+    void setid(int n);
     void setnom(QString n);
     void settype(QString n);
     void setetat(QString n);
@@ -19,16 +19,20 @@ public:
     QString get_etat();
     QString get_quantite();
     QString get_date();
-    //int get_id();
+    int get_id();
     Materiaux();
-    Materiaux(QString nom, QString type, QString etat, QString quantite, QString date);
+    Materiaux(int id,QString nom, QString type, QString etat, QString quantite, QString date);
 
     //Fonctionnalitéq de Base relatives à l'entité Materiaux
     bool ajouter();
     QSqlQueryModel * afficher();
-    bool supprimer(const QString nom);
+    bool supprimer(int id);
+    bool update(int id, const QString& nom, const QString& type, const QString& etat, const QString& quantite, const QString& date);
+    //bool update(int id);
+    //void rechercher(QTableView * table,QString );
+
 private:
-    //int id;
+    int id;
     QString nom,type,etat,quantite,date;
 };
 

@@ -17,10 +17,11 @@ test=true;
 
     return  test;
 }
-bool Connection::insertData(const QString &nom, const QString &type, const QString &etat, const QString &quantite, const QString &date)
+bool Connection::insertData(int id, const QString &nom, const QString &type, const QString &etat, const QString &quantite, const QString &date)
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO MATERIAUX (NOM, TYPE, ETAT, QUANTITE, DATE_MISE) VALUES (:nom, :type, :etat, :quantite, :date)");
+    query.prepare("INSERT INTO MATERIAUX (ID_MATERIEL, NOM, TYPE, ETAT, QUANTITE, DATE_MISE) VALUES (:id, :nom, :type, :etat, :quantite, :date)");
+    query.bindValue(":id", id);
         query.bindValue(":nom", nom);
         query.bindValue(":type", type);
         query.bindValue(":etat", etat);

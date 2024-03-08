@@ -1,27 +1,3 @@
-/* #ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
-#include <QMainWindow>
-
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
-
-private:
-    Ui::MainWindow *ui;
-};
-
-#endif // MAINWINDOW_H
-*/
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -44,12 +20,15 @@ private slots:
     //void on_pushButton_clicked();
     void on_pushButton_ajout_clicked();
     void on_pushButton_supprimer_clicked();
+    void on_pushButton_modifier_clicked();
+
+
 
 
 
 private:
     Ui::MainWindow *ui;
-    //Materiaux Mtmp;
+    Materiaux Etmp;
 };
-#endif // MAINWINDOW_H
-
+#endif
+// MAINWINDOW_H
