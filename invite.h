@@ -12,6 +12,7 @@ public:
     Invite();
     Invite(int,QString,QString,QString,QString,int,int);
 
+    //setters
     void setnom(QString n){nom=n;}
     void setprenom(QString n){prenom=n;}
     void setprofession(QString n){profession=n;}
@@ -19,7 +20,7 @@ public:
     void setnbAbonnes(int n){nbAbonnes=n;}
     void setnbParticipation(int n){nbParticipation=n;}
 
-
+    //getters
     QString get_nom(){return nom;}
     QString get_prenom(){return prenom;}
     QString get_profession(){return profession;}
@@ -37,6 +38,7 @@ public:
     void rechercherInvite(const QString &searchTerm, QTableWidget *tableWidget);
     bool trierParNbAbonnes(QTableWidget *tableWidget);
     bool exportToPDF(const QString &filePath, QTableWidget *tableWidget);
+
 private:
     int id,nbAbonnes,nbParticipation;
     QString nom,prenom,profession,email;

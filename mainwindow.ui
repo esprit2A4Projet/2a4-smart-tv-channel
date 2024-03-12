@@ -619,6 +619,103 @@ QPushButton {
         <string>Nombre de Participation</string>
        </property>
       </widget>
+      <widget class="QLabel" name="label_emailError">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>270</y>
+         <width>161</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color:#D1D0FB;
+</string>
+       </property>
+       <property name="text">
+        <string>verifier le format de l'email</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_nbAbonnesError">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>330</y>
+         <width>181</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color:#D1D0FB;</string>
+       </property>
+       <property name="text">
+        <string>le nombre doit etre un entier</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_nbParticipationError">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>400</y>
+         <width>201</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color:#D1D0FB;</string>
+       </property>
+       <property name="text">
+        <string>le nombre de participation doit etre un entier</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_nomError">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>90</y>
+         <width>191</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color:#D1D0FB;</string>
+       </property>
+       <property name="text">
+        <string>Le nom ne doit pas dépasser 10</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_prenomError">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>150</y>
+         <width>201</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color:#D1D0FB;</string>
+       </property>
+       <property name="text">
+        <string>le prenom ne doit pas dépasser 10 c</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_professionError">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>210</y>
+         <width>181</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color:#D1D0FB;</string>
+       </property>
+       <property name="text">
+        <string>La profession doit commencer par une lettre majuscule</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QLineEdit" name="lineEdit_rechercher">
       <property name="geometry">
@@ -874,8 +971,8 @@ QPushButton {
      <widget class="QTableWidget" name="tableWidget">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>200</y>
+        <x>320</x>
+        <y>210</y>
         <width>601</width>
         <height>281</height>
        </rect>
@@ -933,6 +1030,11 @@ QTableWidget::item, QHeaderView::section {
       <column>
        <property name="text">
         <string>Prenom</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Profession</string>
        </property>
       </column>
       <column>

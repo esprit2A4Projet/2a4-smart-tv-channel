@@ -13,7 +13,7 @@
 #include <QTextTableCell>
 #include <QTextTableFormat>
 
-
+/*-------------------------------------------Constructeur Par Defaut------------------------------------------------------*/
 Invite::Invite()
 {
     nom="";
@@ -22,6 +22,7 @@ Invite::Invite()
     email="";
 
 }
+/*-------------------------------------------Constructeur Parametré------------------------------------------------------*/
 
 Invite::Invite(int id, QString nom, QString prenom, QString profession, QString email, int nbAbonnes, int nbParticipation)
 {
@@ -33,14 +34,14 @@ Invite::Invite(int id, QString nom, QString prenom, QString profession, QString 
     this->nbAbonnes=nbAbonnes;
     this->nbParticipation=nbParticipation;
 }
-
+/*-------------------------------------------AJOUT------------------------------------------------------*/
 bool Invite::ajouterInvite()
 {
     Connection c;
     return c.createconnect() && c.insertData(nom, prenom, profession, email, nbAbonnes, nbParticipation);
 }
 
-
+/*-------------------------------------------AFFICHAGE------------------------------------------------------*/
 
 void Invite::afficherInvite(QTableWidget *tableWidget)
 {
@@ -67,6 +68,7 @@ void Invite::afficherInvite(QTableWidget *tableWidget)
     }
     c.db.close();
 }
+/*-------------------------------------------SUPPRESSION------------------------------------------------------*/
 
 bool Invite::supprimerInvite(int id)
 {
@@ -76,6 +78,7 @@ bool Invite::supprimerInvite(int id)
 
     return query.exec();
 }
+/*-------------------------------------------MODIFICATION------------------------------------------------------*/
 
 bool Invite::modifierInvite(int id, const QString &nom, const QString &prenom, const QString &profession, const QString &email, int &nbAbonnes, int &nbParticipation)
 {
@@ -95,6 +98,7 @@ bool Invite::modifierInvite(int id, const QString &nom, const QString &prenom, c
 
     return query.exec();
 }
+/*-------------------------------------------RECHERCHE------------------------------------------------------*/
 
 void Invite::rechercherInvite(const QString &searchTerm, QTableWidget *tableWidget)
 {
@@ -124,6 +128,7 @@ void Invite::rechercherInvite(const QString &searchTerm, QTableWidget *tableWidg
     }
     c.db.close();
 }
+/*-------------------------------------------TRI PAR NBABONNES------------------------------------------------------*/
 bool Invite::trierParNbAbonnes(QTableWidget *tableWidget)
 {
     Connection c;
@@ -163,6 +168,7 @@ bool Invite::trierParNbAbonnes(QTableWidget *tableWidget)
         return false;
     }
 }
+/*-------------------------------------------EXPORTATION------------------------------------------------------*/
 bool Invite::exportToPDF(const QString &filePath, QTableWidget *tableWidget)
 {
     // Create a printer

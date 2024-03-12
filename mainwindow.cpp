@@ -5,15 +5,13 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
-MainWindow::MainWindow(QWidget *parent)
-   : QMainWindow(parent),
-     ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
    ui->setupUi(this);
 
-   connect(this, SIGNAL(dataUpdated()), this, SLOT(updateTableWidget())); // Connect the signal to the slot
+   connect(this, SIGNAL(dataUpdated()), this, SLOT(updateTableWidget())); // connecter le signal envers le slot
 
-   // Initialize the table widget
+   //initialiser la table
    ui->tableWidget->setColumnCount(7);
    QStringList labels{"ID", "Nom", "Prenom", "Profession", "Email", "Nombre d'abonnes", "Nombre de Participation"};
    ui->tableWidget->setHorizontalHeaderLabels(labels);
@@ -27,32 +25,59 @@ MainWindow::MainWindow(QWidget *parent)
    }
 
    connect(ui->pushButton_annuler, &QPushButton::clicked, this, &MainWindow::on_pushButton_annuler_clicked);
+   //controle de saisie
+
+   ui->label_emailError->setVisible(false);
+   ui->label_nbAbonnesError->setVisible(false);
+   ui->label_nbParticipationError->setVisible(false);
+   ui->label_nomError->setVisible(false);
+   ui->label_prenomError->setVisible(false);
+   ui->label_professionError->setVisible(false);
+
+   connect(ui->lineEdit_email, &QLineEdit::textChanged, this, &MainWindow::validateEmail);
+   connect(ui->lineEdit_nbAbonnes, &QLineEdit::textChanged, this, &MainWindow::validateNbAbonnes);
+   connect(ui->lineEdit_nbParticipation, &QLineEdit::textChanged, this, &MainWindow::validateNbParticipation);
+   connect(ui->lineEdit_nom, &QLineEdit::textChanged, this, &MainWindow::validateNom);
+   connect(ui->lineEdit_prenom, &QLineEdit::textChanged, this, &MainWindow::validatePrenom);
+   connect(ui->lineEdit_profession, &QLineEdit::textChanged, this, &MainWindow::validateProfession);
 }
 
+
+//destructeur
 MainWindow::~MainWindow()
 {
    delete ui;
 }
+/************************************************************************CRUD***********************************************************************************/
 
-void MainWindow::on_pushButton_ajouter_clicked()
-{
-    // Validate email format
-        QRegExp emailRegex("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b");
-        QValidator *emailValidator = new QRegExpValidator(emailRegex, this);
-        ui->lineEdit_email->setValidator(emailValidator);
+/*-----------------------------------------------------------------------Ajouter Un Invite-------------------------------------------------------------------*/
+void MainWindow::on_pushButton_ajouter_clicked() {
+    // Valider tous les champs
+    validateEmail(ui->lineEdit_email->text());
+    validateNbAbonnes(ui->lineEdit_nbAbonnes->text());
+    validateNbParticipation(ui->lineEdit_nbParticipation->text());
+    validateNom(ui->lineEdit_nom->text());
+    validatePrenom(ui->lineEdit_prenom->text());
+    validateProfession(ui->lineEdit_profession->text());
 
-        // Validate nbAbonnes and nbParticipation (allow only integers)
-        QIntValidator *intValidator = new QIntValidator(this);
-        ui->lineEdit_nbAbonnes->setValidator(intValidator);
-        ui->lineEdit_nbParticipation->setValidator(intValidator);
+    // Vérifier si toutes les validations sont réussies et si tous les champs sont remplis
+    if (ui->label_emailError->isVisible() ||
+        ui->label_nbAbonnesError->isVisible() ||
+        ui->label_nbParticipationError->isVisible() ||
+        ui->label_nomError->isVisible() ||
+        ui->label_prenomError->isVisible() ||
+        ui->label_professionError->isVisible() ||
+        ui->lineEdit_email->text().isEmpty() ||
+        ui->lineEdit_nbAbonnes->text().isEmpty() ||
+        ui->lineEdit_nbParticipation->text().isEmpty() ||
+        ui->lineEdit_nom->text().isEmpty() ||
+        ui->lineEdit_prenom->text().isEmpty() ||
+        ui->lineEdit_profession->text().isEmpty()) {
+        showCustomMessageBox("Erreur", "Veuillez vérifier les données saisies.", QMessageBox::Critical);
+        return;
+    }
 
-        // Check if the input is valid
-        if (!ui->lineEdit_email->hasAcceptableInput() ||
-            !ui->lineEdit_nbAbonnes->hasAcceptableInput() ||
-            !ui->lineEdit_nbParticipation->hasAcceptableInput()) {
-            showCustomMessageBox("Erreur", "Veuillez vérifier les données saisies.", QMessageBox::Critical);
-            return;
-        }
+    // Si toutes les validations réussissent et tous les champs sont remplis, ajouter l'invite à la base de données
     Invite i;
     i.setnom(ui->lineEdit_nom->text());
     i.setprenom(ui->lineEdit_prenom->text());
@@ -65,16 +90,167 @@ void MainWindow::on_pushButton_ajouter_clicked()
     if (c.createconnect()) {
         if (i.ajouterInvite()) {
             updateTableWidget(ui->lineEdit_rechercher->text());
-            showCustomMessageBox("Success", "Data inserted into the database.", QMessageBox::Information);
+            showCustomMessageBox("Succès", "Succès d'ajout dans la base de données", QMessageBox::Information);
         } else {
-            showCustomMessageBox("Error", "Failed to insert data into the database.", QMessageBox::Critical);
+            showCustomMessageBox("Erreur", "Erreur de l'insertion dans la base de données", QMessageBox::Critical);
         }
     } else {
-        showCustomMessageBox("Error", "Failed to connect to the database.", QMessageBox::Critical);
+        showCustomMessageBox("Erreur", "Connexion impossible à la base de données.", QMessageBox::Critical);
     }
 }
 
 
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------Mettre à jour les informations d'un Invite-------------------------------------------------------------------*/
+
+void MainWindow::on_pushButton_update_clicked()
+{
+   QItemSelectionModel *select = ui->tableWidget->selectionModel();
+   QModelIndexList selectedIndexes = select->selectedIndexes();
+
+   if (!selectedIndexes.isEmpty()) {
+       int row = selectedIndexes.first().row();
+       int idToModify = ui->tableWidget->item(row, 0)->text().toInt();
+
+       // Obtenez les nouvelles valeurs à partir des cellules sélectionnées dans le tableau
+       QString nom = ui->tableWidget->item(row, 1)->text();
+       QString prenom = ui->tableWidget->item(row, 2)->text();
+       QString profession = ui->tableWidget->item(row, 3)->text();
+       QString email = ui->tableWidget->item(row, 4)->text();
+       int nbAbonnes = ui->tableWidget->item(row, 5)->text().toInt();
+       int nbParticipation = ui->tableWidget->item(row, 6)->text().toInt();
+
+       // controle de saisie (email)
+       if (!email.isEmpty() && ui->tableWidget->currentColumn() == 4) {
+           QRegExp emailRegex("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b");
+           if (!emailRegex.exactMatch(email)) {
+               showCustomMessageBox("Error", "Format d'email invalide.", QMessageBox::Critical);
+               return;
+           }
+       }
+
+       // controle de saisie (nbAbonnes et nbParticipation)
+       bool nbAbonnesOk, nbParticipationOk;
+       nbAbonnesOk = true;
+       nbParticipationOk = true;
+
+       // verifier la saisie
+       if (ui->tableWidget->currentColumn() == 5) {
+           nbAbonnesOk = true;
+       } else if (ui->tableWidget->currentColumn() == 6) {
+           nbParticipation = ui->tableWidget->item(row, 6)->text().toInt(&nbParticipationOk);
+       }
+
+
+       if (!nbAbonnesOk || !nbParticipationOk) {
+           showCustomMessageBox("Error", "Veuillez entrer des nombres valides pour Nombre d'abonnes et Nombre de Participation.", QMessageBox::Critical);
+           return;
+       }
+
+       // Appelez la fonction modifierInvite pour mettre à jour la base de données
+       Invite i;
+       if (i.modifierInvite(idToModify, nom, prenom, profession, email, nbAbonnes, nbParticipation)) {
+           // Mettez à jour la ligne dans le tableau avec les nouvelles valeurs
+           ui->tableWidget->setItem(row, 1, new QTableWidgetItem(nom));
+           ui->tableWidget->setItem(row, 2, new QTableWidgetItem(prenom));
+           ui->tableWidget->setItem(row, 3, new QTableWidgetItem(profession));
+           ui->tableWidget->setItem(row, 4, new QTableWidgetItem(email));
+           ui->tableWidget->setItem(row, 5, new QTableWidgetItem(QString::number(nbAbonnes)));
+           ui->tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(nbParticipation)));
+
+           emit dataUpdated(); // Mettre à jour la vue après la modification
+           showCustomMessageBox("Succés", "Succés d'ajout dans la base de données", QMessageBox::Information);
+       }
+       else
+       {
+           showCustomMessageBox("Erreur", "Connexion impossible à la base de données.", QMessageBox::Critical);
+       }
+   }
+   else
+   {
+       showCustomMessageBox("Attention", "Selectionnez une ligne à modifier", QMessageBox::Warning);
+   }
+}
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------Supprimer Un Invite-------------------------------------------------------------------*/
+void MainWindow::on_pushButton_delete_clicked()
+{
+   QItemSelectionModel *select = ui->tableWidget->selectionModel();
+   QModelIndexList selectedIndexes = select->selectedIndexes();
+
+   if (!selectedIndexes.isEmpty()) {
+        int row = selectedIndexes.first().row();
+       QTableWidgetItem *item = ui->tableWidget->item(row, 0);
+       int idToDelete = item->text().toInt();
+
+       Invite i;
+       if (i.supprimerInvite(idToDelete))
+       {
+           // Supprimer la ligne de l'affichage
+           ui->tableWidget->removeRow(row);
+           emit dataUpdated(); // Mettre à jour la vue après la suppression
+           showCustomMessageBox("Success", "Data deleted from the database.", QMessageBox::Information);
+       }
+       else
+       {
+           showCustomMessageBox("Error", "Failed to delete data from the database.", QMessageBox::Critical);
+       }
+   }
+   else
+   {
+       showCustomMessageBox("Warning", "Please select a row to delete.", QMessageBox::Warning);
+   }
+}
+/*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/***************************************************************************FONCTIONNALITES**************************************************************************************/
+
+/*-----------------------------------------------------------------------Rechercher Un Invite----------------------------------------------------------------------------------*/
+
+void MainWindow::on_pushButton_rechercher_clicked()
+{
+   QString searchTerm = ui->lineEdit_rechercher->text();
+   updateTableWidget(searchTerm);
+}
+
+/*-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------Trier Un Invite-----------------------------------------------------------------------------------*/
+void MainWindow::on_pushButton_trier_clicked()
+{
+    Invite i;
+    if (i.trierParNbAbonnes(ui->tableWidget)) {
+        emit dataUpdated();  // Emit the signal to update the table
+        showCustomMessageBox("Success", "Data sorted by Nombre d'abonnes.", QMessageBox::Information);
+    } else {
+        showCustomMessageBox("Error", "Failed to sort data.", QMessageBox::Critical);
+    }
+}
+/*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------Exporter les informations d'un Invite-------------------------------------------------------------------*/
+void MainWindow::on_pushButton_exporter_clicked()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, "Save PDF", "", "PDF Files (*.pdf)");
+
+    if (!filePath.isEmpty())
+    {
+        Invite i;
+        if (i.exportToPDF(filePath, ui->tableWidget))
+        {
+            showCustomMessageBox("Success", "Table exported to PDF.", QMessageBox::Information);
+        }
+        else
+        {
+            showCustomMessageBox("Error", "Failed to export table to PDF.", QMessageBox::Critical);
+        }
+    }
+}
+/*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------Effacer le formulaire-------------------------------------------------------------------*/
 void MainWindow::on_pushButton_annuler_clicked()
 {
    ui->lineEdit_nom->clear();
@@ -84,6 +260,9 @@ void MainWindow::on_pushButton_annuler_clicked()
    ui->lineEdit_nbAbonnes->clear();
    ui->lineEdit_nbParticipation->clear();
 }
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------------Rafraichir la table apres chaque modification--------------------------------------------------------------------------------------*/
 
 void MainWindow::updateTableWidget(const QString &filter)
 {
@@ -118,103 +297,10 @@ void MainWindow::updateTableWidget(const QString &filter)
 
    delete model;
 }
+/*-------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
+/*-----------------------------------------------------------------------Modifier le style du Message Box-------------------------------------------------------------------*/
 
-
-void MainWindow::on_pushButton_delete_clicked()
-{
-   QItemSelectionModel *select = ui->tableWidget->selectionModel();
-   QModelIndexList selectedIndexes = select->selectedIndexes();
-
-   if (!selectedIndexes.isEmpty()) {
-        int row = selectedIndexes.first().row();
-       QTableWidgetItem *item = ui->tableWidget->item(row, 0);
-       int idToDelete = item->text().toInt();
-
-       Invite i;
-       if (i.supprimerInvite(idToDelete)) {
-           // Supprimer la ligne de l'affichage
-           ui->tableWidget->removeRow(row);
-           emit dataUpdated(); // Mettre à jour la vue après la suppression
-           showCustomMessageBox("Success", "Data deleted from the database.", QMessageBox::Information);
-       } else {
-           showCustomMessageBox("Error", "Failed to delete data from the database.", QMessageBox::Critical);
-       }
-   } else {
-       showCustomMessageBox("Warning", "Please select a row to delete.", QMessageBox::Warning);
-   }
-}
-
-void MainWindow::on_pushButton_update_clicked()
-{
-   QItemSelectionModel *select = ui->tableWidget->selectionModel();
-   QModelIndexList selectedIndexes = select->selectedIndexes();
-
-   if (!selectedIndexes.isEmpty()) {
-       int row = selectedIndexes.first().row();
-       int idToModify = ui->tableWidget->item(row, 0)->text().toInt();
-
-       // Obtenez les nouvelles valeurs à partir des cellules sélectionnées dans le tableau
-       QString nom = ui->tableWidget->item(row, 1)->text();
-       QString prenom = ui->tableWidget->item(row, 2)->text();
-       QString profession = ui->tableWidget->item(row, 3)->text();
-       QString email = ui->tableWidget->item(row, 4)->text();
-       int nbAbonnes = ui->tableWidget->item(row, 5)->text().toInt();
-       int nbParticipation = ui->tableWidget->item(row, 6)->text().toInt();
-
-       // Validate email format only if the email field is modified
-       if (!email.isEmpty() && ui->tableWidget->currentColumn() == 4) {
-           QRegExp emailRegex("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b");
-           if (!emailRegex.exactMatch(email)) {
-               showCustomMessageBox("Error", "Format d'email invalide.", QMessageBox::Critical);
-               return;
-           }
-       }
-
-       // Validate nbAbonnes and nbParticipation (allow only integers)
-       bool nbAbonnesOk, nbParticipationOk;
-       nbAbonnesOk = true;
-       nbParticipationOk = true;
-
-       // Validate only if the respective columns are modified
-       if (ui->tableWidget->currentColumn() == 5) {
-           nbAbonnesOk = true;  // No validation needed for nbAbonnes
-       } else if (ui->tableWidget->currentColumn() == 6) {
-           nbParticipation = ui->tableWidget->item(row, 6)->text().toInt(&nbParticipationOk);
-       }
-
-
-       if (!nbAbonnesOk || !nbParticipationOk) {
-           showCustomMessageBox("Error", "Veuillez entrer des nombres valides pour Nombre d'abonnes et Nombre de Participation.", QMessageBox::Critical);
-           return;
-       }
-
-       // Appelez la fonction modifierInvite pour mettre à jour la base de données
-       Invite i;
-       if (i.modifierInvite(idToModify, nom, prenom, profession, email, nbAbonnes, nbParticipation)) {
-           // Mettez à jour la ligne dans le tableau avec les nouvelles valeurs
-           ui->tableWidget->setItem(row, 1, new QTableWidgetItem(nom));
-           ui->tableWidget->setItem(row, 2, new QTableWidgetItem(prenom));
-           ui->tableWidget->setItem(row, 3, new QTableWidgetItem(profession));
-           ui->tableWidget->setItem(row, 4, new QTableWidgetItem(email));
-           ui->tableWidget->setItem(row, 5, new QTableWidgetItem(QString::number(nbAbonnes)));  // Convert int to QString
-           ui->tableWidget->setItem(row, 6, new QTableWidgetItem(QString::number(nbParticipation)));  // Convert int to QString
-
-           emit dataUpdated(); // Mettre à jour la vue après la modification
-           showCustomMessageBox("Success", "Data modified in the database.", QMessageBox::Information);
-       } else {
-           showCustomMessageBox("Error", "Failed to modify data in the database.", QMessageBox::Critical);
-       }
-   } else {
-       showCustomMessageBox("Warning", "Please select a row to modify.", QMessageBox::Warning);
-   }
-}
-
-void MainWindow::on_pushButton_rechercher_clicked()
-{
-   QString searchTerm = ui->lineEdit_rechercher->text();
-   updateTableWidget(searchTerm);
-}
 void MainWindow::showCustomMessageBox(const QString &title, const QString &message, QMessageBox::Icon icon)
 {
    // Créer la boîte de message avec le texte et l'icône fournis
@@ -271,30 +357,42 @@ void MainWindow::showCustomMessageBox(const QString &title, const QString &messa
    // Afficher la boîte de message
    messageBox.exec();
 }
-void MainWindow::on_pushButton_trier_clicked()
-{
-    Invite i;
-    if (i.trierParNbAbonnes(ui->tableWidget)) {
-        emit dataUpdated();  // Emit the signal to update the table
-        showCustomMessageBox("Success", "Data sorted by Nombre d'abonnes.", QMessageBox::Information);
-    } else {
-        showCustomMessageBox("Error", "Failed to sort data.", QMessageBox::Critical);
-    }
+/*---------------------------------------------------------------------------Controle de Saisie-----------------------------------------------------------------------------------*/
+// Fonction de validation de l'e-mail
+void MainWindow::validateEmail(const QString &text) {
+    QRegExp emailRegex("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b");
+    bool isValid = emailRegex.exactMatch(text);
+    ui->label_emailError->setVisible(!isValid);
+    ui->label_emailError->setStyleSheet(isValid ? "" : "color: red;");
 }
-void MainWindow::on_pushButton_exporter_clicked()
-{
-    QString filePath = QFileDialog::getSaveFileName(this, "Save PDF", "", "PDF Files (*.pdf)");
 
-    if (!filePath.isEmpty())
-    {
-        Invite i;
-        if (i.exportToPDF(filePath, ui->tableWidget))
-        {
-            showCustomMessageBox("Success", "Table exported to PDF.", QMessageBox::Information);
-        }
-        else
-        {
-            showCustomMessageBox("Error", "Failed to export table to PDF.", QMessageBox::Critical);
-        }
-    }
+// Fonction de validation du nombre d'abonnés
+void MainWindow::validateNbAbonnes(const QString &text) {
+    bool isValid = !text.isEmpty() && text.toInt() > 0;
+    ui->label_nbAbonnesError->setVisible(!isValid);
+    ui->label_nbAbonnesError->setStyleSheet(isValid ? "" : "color: red;");
+}
+
+// Fonction de validation du nombre de participations
+void MainWindow::validateNbParticipation(const QString &text) {
+    bool isValid = !text.isEmpty() && text.toInt() > 0;
+    ui->label_nbParticipationError->setVisible(!isValid);
+     ui->label_nbParticipationError->setStyleSheet(isValid ? "" : "color: red;");
+}
+void MainWindow::validateNom(const QString &text) {
+    bool isValid = !text.isEmpty() && text.length() <= 10; // Le nom ne doit pas être vide et ne doit pas dépasser 10 caractères
+    ui->label_nomError->setVisible(!isValid);
+    ui->label_nomError->setStyleSheet(isValid ? "" : "color: red;");
+}
+
+void MainWindow::validatePrenom(const QString &text) {
+    bool isValid = !text.isEmpty() && text.length() <= 10; // Le prénom ne doit pas être vide et ne doit pas dépasser 10 caractères
+    ui->label_prenomError->setVisible(!isValid);
+    ui->label_prenomError->setStyleSheet(isValid ? "" : "color: red;");
+}
+
+void MainWindow::validateProfession(const QString &text) {
+    bool isValid = !text.isEmpty() && text.at(0).isUpper(); // La profession ne doit pas être vide et doit commencer par une lettre majuscule
+    ui->label_professionError->setVisible(!isValid);
+    ui->label_professionError->setStyleSheet(isValid ? "" : "color: red;");
 }
