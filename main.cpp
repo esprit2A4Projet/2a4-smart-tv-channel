@@ -19,10 +19,11 @@ int main(int argc, char *argv[])
 
             if(test)
             {w.show();
+                 w.update_table_de_transactions(); // Charger les données du tableau au démarrage
 
-              /*  QMessageBox::information(nullptr, QObject::tr("database is open"),
+                QMessageBox::information(nullptr, QObject::tr("database is open"),
                             QObject::tr("connection successful.\n"
-                                        "Click Cancel to exit."), QMessageBox::Cancel);*/
+                                        "Click Cancel to exit."), QMessageBox::Cancel);
 
         }
             else

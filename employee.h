@@ -8,12 +8,12 @@ class Employee
 {
 private:
 
- int id,salaire;
- QString nom,prenom,date_embauche,poste;
+ int id,salaire,cin;
+ QString nom,prenom,date_embauche,poste,email,mot_de_passe;
 
 public:
  Employee();
- Employee(QString,QString,QString,int,QString);
+ Employee(QString,QString,QString,QString,int,QString,int);
 
 int get_id();
 QString get_nom();
@@ -21,13 +21,17 @@ QString get_prenom();
 QString get_date_embauche();
 int get_salaire();
 QString get_poste();
-
+int get_cin();
+QString get_mot_de_passe();
+QString get_email();
 void setnom(QString n);
 void setprenom(QString n);
 void setdate_embauche(QString n);
 void setsalaire(int n);
 void setposte(QString n);
-
+void setcin(int n);
+void setemail(QString n);
+void setmot_de_passe(QString n);
 bool ajouter();
 QSqlQueryModel * afficher();
 bool supprimer(int );
