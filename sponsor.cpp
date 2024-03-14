@@ -81,19 +81,14 @@ bool Sponsor::ajouter()
 
 void Sponsor::afficher(QTableWidget *tableWidget)
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-    db.setDatabaseName("Source_Projet2A4");
-    db.setUserName("amine");
-    db.setPassword("amine");
-    db.open();
+    Connection c;
 
-    QSqlQuery query(db);
-    QString str = ("SELECT NOM, BUDGET, PACK, DATE_DEB, DATE_FIN, TELEPHONE FROM SPONSOR");
-    if (query.exec(str))
+    QSqlQuery query(c.db);
+    if (query.exec("SELECT * FROM SPONSOR"))
     {
-        tableWidget->setColumnCount(6);
+        tableWidget->setColumnCount(7);
         QStringList labels;
-        labels << "Nom" << "Budget" << "Pack" << "Date debut" << "Date fin" << "Telephone";
+        labels <<"Id" << "Nom" << "Budget" << "Pack" << "Date debut" << "Date fin" << "Telephone";
         tableWidget->setHorizontalHeaderLabels(labels);
         int RowNumber = 0;
         while (query.next())
@@ -105,6 +100,7 @@ void Sponsor::afficher(QTableWidget *tableWidget)
             QTableWidgetItem *date_deb = new QTableWidgetItem;
             QTableWidgetItem *date_fin = new QTableWidgetItem;
             QTableWidgetItem *telephone = new QTableWidgetItem;
+            QTableWidgetItem *id = new QTableWidgetItem;
 
             nom->setText(query.value("NOM").toString());
             budget->setText(query.value("BUDGET").toString());
@@ -112,17 +108,20 @@ void Sponsor::afficher(QTableWidget *tableWidget)
             date_deb->setText(query.value("DATE_DEB").toString());
             date_fin->setText(query.value("DATE_FIN").toString());
             telephone->setText(query.value("TELEPHONE").toString());
+            id->setText(query.value("ID_SPONSOR").toString());
 
-            tableWidget->setItem(RowNumber, 0, nom);
-            tableWidget->setItem(RowNumber, 1, budget);
-            tableWidget->setItem(RowNumber, 2, pack);
-            tableWidget->setItem(RowNumber, 3, date_deb);
-            tableWidget->setItem(RowNumber, 4, date_fin);
-            tableWidget->setItem(RowNumber, 5, telephone);
+            tableWidget->setItem(RowNumber, 0, id);
+            tableWidget->hideColumn(0);
+            tableWidget->setItem(RowNumber, 1, nom);
+            tableWidget->setItem(RowNumber, 2, budget);
+            tableWidget->setItem(RowNumber, 3, pack);
+            tableWidget->setItem(RowNumber, 4, date_deb);
+            tableWidget->setItem(RowNumber, 5, date_fin);
+            tableWidget->setItem(RowNumber, 6, telephone);
             RowNumber++;
         }
     }
-    db.close();
+    c.db.close();
 }
 
 bool Sponsor::supprimer(int id)
@@ -161,13 +160,9 @@ bool Sponsor::modifier(int id_sponsor, const QString &nom, const QString &budget
 
 void Sponsor::rechercher(int id_sponsor, QTableWidget *tableWidget)
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-    db.setDatabaseName("Source_Projet2A4");
-    db.setUserName("amine");
-    db.setPassword("amine");
-    db.open();
+    Connection c;
 
-    QSqlQuery query(db);
+    QSqlQuery query(c.db);
     query.prepare("SELECT * FROM SPONSOR WHERE ID_SPONSOR = :id_sponsor");
     query.bindValue(":id_sponsor", id_sponsor);
 
@@ -194,18 +189,14 @@ void Sponsor::rechercher(int id_sponsor, QTableWidget *tableWidget)
         qDebug() << "Error executing query: " << query.lastError().text();
     }
 
-    db.close();
+    c.db.close();
 }
 
 bool Sponsor::trierParPack(QTableWidget *tableWidget)
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-    db.setDatabaseName("Source_Projet2A4");
-    db.setUserName("amine");
-    db.setPassword("amine");
-    db.open();
+    Connection c;
 
-    QSqlQuery query(db);
+    QSqlQuery query(c.db);
     query.prepare("SELECT * FROM SPONSOR ORDER BY PACK ASC");
 
 
@@ -217,12 +208,12 @@ bool Sponsor::trierParPack(QTableWidget *tableWidget)
             // Optional: You can reset the sorting mode if needed
             // tableWidget->setSortingEnabled(false);
 
-        db.close();
+        c.db.close();
         return true;
     }
     else
     {
-        db.close();
+        c.db.close();
         return false;
     }
 }

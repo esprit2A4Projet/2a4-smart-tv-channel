@@ -35,11 +35,13 @@ public:
 
     //fonctionnet crud
     bool ajouter();
-    void afficher(QTableWidget *tableWidget);
+    void afficher(QTableWidget *tableWidgetS);
     bool supprimer(int);
     bool modifier(int id_sponsor, const QString &nom, const QString &budget, const QString &pack, const QString &date_deb, const QString &date_fin, const QString &telephone);
-    void rechercher(int id_sponsor, QTableWidget *tableWidget);
-    bool trierParPack(QTableWidget *tableWidget);
+    void rechercher(int id_sponsor, QTableWidget *tableWidgetS);
+    bool trierParPack(QTableWidget *tableWidgetS);
+
+
 
 
 private:

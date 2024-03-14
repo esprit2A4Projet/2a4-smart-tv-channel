@@ -17,21 +17,36 @@ public:
     ~MainWindow();
 
 private slots:
-    void updateTableWidget();
-    void on_pushButton_ajouter_clicked();
-    void on_pushButton_supprimer_clicked();
-    void on_pushButton_modifier_clicked();
-    void on_pushButton_annuler_clicked();
-    void on_pushButton_rechercher_clicked();
-    void on_pushButton_trier_clicked();
+    void updateTableWidget_S();
+    void on_pushButton_ajouterS_clicked();
+
+    void on_pushButton_supprimerS_clicked();
+
+    void on_pushButton_modifierS_clicked();
+
+    void on_pushButton_annulerS_clicked();
+
+    void on_pushButton_rechercherS_clicked();
+
+    void on_pushButton_trierS_clicked();
+
     void on_PDF_clicked();
+
     void on_pushButton_reset_clicked();
+
+    //void on_SMS_clicked();
+    //control de saisie
+    void validateNom(const QString &text);
+    void validateBudget(const QString &text);
+    void validateDate(const QString &dateDeb, const QString &dateFin);
+    void validateTelephone(const QString &text);
 
 signals:
     void dataUpdated();
 private:
     Ui::MainWindow *ui;
     QSqlQueryModel *model;
+    QHash<int,int> idToRowMap;
 };
 
 #endif // MAINWINDOW_H
