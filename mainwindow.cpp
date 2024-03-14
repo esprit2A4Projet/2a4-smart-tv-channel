@@ -22,7 +22,6 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QSignalMapper>
-#include <QOverload>
 //#include <twilio-cpp/Rest.h>
 
 
@@ -45,25 +44,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_DateError->setVisible(false);
     ui->label_Date2Error->setVisible(false);
     ui->label_TelError->setVisible(false);
-    QSignalMapper *dateMapper = new QSignalMapper(this);
+
 
     connect(ui->lineEdit_nomS, &QLineEdit::textChanged, this, &MainWindow::validateNom);
     connect(ui->lineEdit_budget, &QLineEdit::textChanged, this, &MainWindow::validateBudget);
-    /*connect(ui->dateEdit, &QDateEdit::dateChanged, this, &MainWindow::validateDate);
-    connect(ui->dateEdit_2, &QDateEdit::dateChanged, this, &MainWindow::validateDate);*/
+    //connect(ui->dateEdit_2, &QDateEdit::dateChanged, this, &MainWindow::validateDate);
     connect(ui->lineEdit_tel, &QLineEdit::textChanged, this, &MainWindow::validateTelephone);
-
-    connect(ui->dateEdit_2, &QDateEdit::dateChanged, dateMapper, [dateMapper, this](){
-       dateMapper->setProperty("dateDeb", ui->dateEdit->date().toString("dd/MM/yyyy"));
-       dateMapper->setProperty("dateFin", ui->dateEdit_2->date().toString("dd/MM/yyyy"));
-       dateMapper->map();
-    });
-
-    /*connect(dateMapper, QOverload<>::of(&QSignalMapper::mapped), this, [this, dateMapper]() {
-       validateDate(dateMapper->property("dateDeb").toString(), dateMapper->property("dateFin").toString());
-    });*/
-
-
 
 
 }
@@ -75,14 +61,16 @@ MainWindow::~MainWindow()
 
 //control de saisie
 
-void MainWindow::validateNom(const QString &text) {
-    QRegExp rx("^[a-zA-Z]+$");
-        bool isValid = rx.exactMatch(text) && text.length() <= 20;
-        ui->label_NomError->setVisible(!isValid);
-        ui->label_NomError->setStyleSheet(isValid ? "" : "color: red;");
+void MainWindow::validateNom(const QString &text)
+{
+    QRegExp rx("^[a-zA-Z _]+$");
+    bool isValid = rx.exactMatch(text) && text.length() <= 20;
+    ui->label_NomError->setVisible(!isValid);
+    ui->label_NomError->setStyleSheet(isValid ? "" : "color: red;");
 }
 
-void MainWindow::validateBudget(const QString &text) {
+void MainWindow::validateBudget(const QString &text)
+{
     bool budgetConversionOk;
     double budgetValue = text.toDouble(&budgetConversionOk);
     bool isValid = budgetConversionOk && text.length() <= 20;
@@ -92,19 +80,16 @@ void MainWindow::validateBudget(const QString &text) {
 
 }
 
-void MainWindow::validateDate(const QString &dateDeb, const QString &dateFin) {
-    QDate startDate = QDate::fromString(dateDeb, "dd/MM/yyyy");
-    QDate endDate = QDate::fromString(dateFin, "dd/MM/yyyy");
-
-    bool isValid = startDate.isValid() && endDate.isValid() && endDate >= startDate;
+/*void MainWindow::validateDate(const QDate &endDate) {
+    bool isValid = endDate >= ui->dateEdit->date();
 
     // Set visibility and style for date error labels
-    ui->label_DateError->setVisible(!startDate.isValid());
-    ui->label_Date2Error->setVisible(!endDate.isValid() || endDate < startDate);
+    //ui->label_DateError->setVisible(!startDate.isValid());
+    ui->label_Date2Error->setVisible(!isValid);
+}*/
 
-}
-
-void MainWindow::validateTelephone(const QString &text) {
+void MainWindow::validateTelephone(const QString &text)
+{
     bool isValid = text.length() == 8 && text.toInt(); // Check for 8 digits and numeric characters
     ui->label_TelError->setVisible(!isValid);
     ui->label_TelError->setStyleSheet(isValid ? "" : "color: red;");
@@ -122,18 +107,16 @@ void MainWindow::on_pushButton_ajouterS_clicked()
     s.Setdate_fin(ui->dateEdit_2->text());
     s.Settelephone(ui->lineEdit_tel->text());
 
-    /*if (s.Getnom().isEmpty() || s.Getbudget().isEmpty() || s.Getpack().isEmpty() ||
-            s.Getdate_deb().isEmpty() || s.Getdate_fin().isEmpty() || s.Gettelephone().isEmpty()) {
-            QMessageBox::critical(this, "Error", "The fields must not be empty.");
-            return; // Exit the function to prevent further execution
-        }*/
 
+    QDate dateDeb = ui->dateEdit->date();
+    QDate dateFin = ui->dateEdit_2->date();
+    if (dateFin < dateDeb) {
+        QMessageBox::critical(this, "Erreur", "Plage de dates non valide. Date_fin ne devrait pas l’être avant date_deb.");
+        return;
+    }
 
     if (ui->label_NomError->isVisible() ||
-        ui->lineEdit_budget->isVisible() ||
-        ui->dateEdit_2->isVisible() ||
-        ui->label_DateError->isVisible() ||
-        ui->label_Date2Error->isVisible() ||
+        ui->label_BudgetError->isVisible() ||
         ui->label_TelError->isVisible() || s.Getnom().isEmpty() || s.Getbudget().isEmpty() || s.Getpack().isEmpty() ||
             s.Getdate_deb().isEmpty() || s.Getdate_fin().isEmpty() || s.Gettelephone().isEmpty()) {
         QMessageBox::critical(this, "Erreur", "Veuillez vérifier les données saisies.");
@@ -147,17 +130,17 @@ void MainWindow::on_pushButton_ajouterS_clicked()
         {
             if (c.insertData(s.Getnom(), s.Getbudget(), s.Getpack(), s.Getdate_deb(), s.Getdate_fin(), s.Gettelephone() ))
             {
-                emit dataUpdated(); // Emit the signal after successful insertion
-                QMessageBox::information(this, "Success", "Data inserted into the database.");
+                emit dataUpdated();
+                QMessageBox::information(this, "Success", "Données insérées dans la base de données.");
             }
             else
             {
-                QMessageBox::critical(this, "Error", "Failed to insert data into the database.");
+                QMessageBox::critical(this, "Erreur", "Échec de l'insertion des données dans la base de données.");
             }
         }
         else
         {
-            QMessageBox::critical(this, "Error", "Failed to connect to the database.");
+            QMessageBox::critical(this, "Erreur", "Échec de la connexion à la base de données.");
         }
 }
 
@@ -222,7 +205,7 @@ void MainWindow::on_pushButton_supprimerS_clicked()
             emit dataUpdated(); // Mettre à jour la vue après la suppression
             QMessageBox::information(this, "Success", "Data deleted from the database.");
         } else {
-            QMessageBox::critical(this, "Error", "Failed to delete data from the database.");
+            QMessageBox::critical(this, "Erreur", "Failed to delete data from the database.");
         }
     } else {
         QMessageBox::warning(this, "Warning", "Please select a row to delete.");
@@ -246,38 +229,41 @@ void MainWindow::on_pushButton_modifierS_clicked()
         QString date_fin = ui->tableWidget_S->item(row, 5)->text();
         QString telephone = ui->tableWidget_S->item(row, 6)->text();
 
-        // Contrôles de saisie
+        // Contrôle de saisie
         if (nom.isEmpty() || budget.isEmpty() ||
                 date_deb.isEmpty() || date_fin.isEmpty() || telephone.isEmpty()) {
-            QMessageBox::critical(this, "Error", "Les champs ne doivent pas être vides.");
+            QMessageBox::critical(this, "Erreur", "Les champs ne doivent pas être vides.");
             return;
         }
 
         // Validation des saisies
-        QRegExp rx("^[a-zA-Z]+$");
+
+        // Validation du nom
+        QRegExp rx("^[a-zA-Z _]+$");
         if (nom.length() > 20 || !rx.exactMatch(nom)) {
-            QMessageBox::critical(this, "Error", "Le nom ne doit pas dépasser 20 caractères et doit être alphabétique.");
+            QMessageBox::critical(this, "Erreur", "Le nom ne doit pas dépasser 20 caractères et doit être alphabétique.");
             return;
         }
 
+        // Validation du budget
         bool budgetConversionOk;
         double budgetValue = budget.toDouble(&budgetConversionOk);
-        if (!budgetConversionOk || budget.length() > 20) {
-            QMessageBox::critical(this, "Error", "Le budget doit être un nombre valide.");
+        if (!budgetConversionOk) {
+            QMessageBox::critical(this, "Erreur", "Le budget doit être un nombre valide.");
             return;
         }
 
-        // Date validation
-        QDate dateDeb = ui->dateEdit->date();
-        QDate dateFin = ui->dateEdit_2->date();
-        if (dateFin < dateDeb) {
-            QMessageBox::critical(this, "Error", "Plage de dates non valide. Date_fin ne devrait pas l’être avant date_deb.");
+        // Validation de la date
+        QDate startDate = QDate::fromString(date_deb, "dd/MM/yyyy");
+        QDate endDate = QDate::fromString(date_fin, "dd/MM/yyyy");
+        if (!startDate.isValid() || !endDate.isValid() || endDate < startDate) {
+            QMessageBox::critical(this, "Erreur", "Plage de dates non valide. Date_fin ne devrait pas être avant date_deb.");
             return;
         }
 
-        // Telephone validation
+        // Validation du téléphone
         if (telephone.length() != 8 || !telephone.toInt()) {
-            QMessageBox::critical(this, "Error", "Le téléphone doit être composé de 8 chiffres.");
+            QMessageBox::critical(this, "Erreur", "Le téléphone doit être composé de 8 chiffres.");
             return;
         }
 
@@ -298,12 +284,13 @@ void MainWindow::on_pushButton_modifierS_clicked()
         }
         else
         {
-            QMessageBox::critical(this, "Error", "Échec de la modification des données dans la base de données.");
+            QMessageBox::critical(this, "Erreur", "Échec de la modification des données dans la base de données.");
         }
     } else {
-        QMessageBox::warning(this, "Warning", "Veuillez sélectionner une ligne à modifier.");
+        QMessageBox::warning(this, "Avertissement", "Veuillez sélectionner une ligne à modifier.");
     }
 }
+
 
 
 
@@ -316,20 +303,19 @@ void MainWindow::on_pushButton_reset_clicked()
 
 void MainWindow::on_pushButton_rechercherS_clicked()
 {
-    bool conversionOk;
-    int id_sponsor = ui->lineEdit_rechercherS->text().toInt(&conversionOk);
+    QString nomSponsor = ui->lineEdit_rechercherS->text();
 
-    if (conversionOk)
+    if (!nomSponsor.isEmpty())
     {
-        // Perform the search by id_sponsor
+        // Perform the search by sponsor name
         Sponsor s;
         emit dataUpdated();
-        s.rechercher(id_sponsor, ui->tableWidget_S);
+        s.rechercher(nomSponsor, ui->tableWidget_S);
 
     }
     else
     {
-        QMessageBox::warning(this, "Error", "Please enter a valid ID for the search.");
+        QMessageBox::warning(this, "Error", "Veuillez entrer un nom de sponsor pour la recherche.");
     }
 }
 
@@ -338,9 +324,9 @@ void MainWindow::on_pushButton_trierS_clicked()
 {
     Sponsor s;
     if (s.trierParPack(ui->tableWidget_S)) {
-        QMessageBox::information(this,"Success", "Data sorted by Packs");
+        QMessageBox::information(this,"Success", "Tableau trie par packs.");
     } else {
-        QMessageBox::critical(this,"Error", "Failed to sort data.");
+        QMessageBox::critical(this,"Erreur", "Impossible de trier le tableau.");
     }
 }
 
@@ -399,7 +385,7 @@ void MainWindow::on_PDF_clicked()
 
     QTextDocument doc;
     doc.setHtml(strStream);
-    doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
+    doc.setPageSize(printer.pageRect().size());
     doc.print(&printer);
 }
 

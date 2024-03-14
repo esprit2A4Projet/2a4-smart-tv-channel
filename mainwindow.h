@@ -38,7 +38,7 @@ private slots:
     //control de saisie
     void validateNom(const QString &text);
     void validateBudget(const QString &text);
-    void validateDate(const QString &dateDeb, const QString &dateFin);
+    //void validateDate(const QDate &startDate);
     void validateTelephone(const QString &text);
 
 signals:
@@ -46,7 +46,6 @@ signals:
 private:
     Ui::MainWindow *ui;
     QSqlQueryModel *model;
-    QHash<int,int> idToRowMap;
 };
 
 #endif // MAINWINDOW_H

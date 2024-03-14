@@ -158,13 +158,13 @@ bool Sponsor::modifier(int id_sponsor, const QString &nom, const QString &budget
     return true;
 }
 
-void Sponsor::rechercher(int id_sponsor, QTableWidget *tableWidget)
+void Sponsor::rechercher(const QString &nomSponsor, QTableWidget *tableWidget)
 {
     Connection c;
 
     QSqlQuery query(c.db);
-    query.prepare("SELECT * FROM SPONSOR WHERE ID_SPONSOR = :id_sponsor");
-    query.bindValue(":id_sponsor", id_sponsor);
+    query.prepare("SELECT * FROM SPONSOR WHERE NOM = :nomSponsor");
+    query.bindValue(":nomSponsor", nomSponsor);
 
     if (query.exec())
     {
@@ -191,6 +191,8 @@ void Sponsor::rechercher(int id_sponsor, QTableWidget *tableWidget)
 
     c.db.close();
 }
+
+
 
 bool Sponsor::trierParPack(QTableWidget *tableWidget)
 {
