@@ -8,6 +8,7 @@
 class Transaction
 {
 public:
+    void set_id(QString n);
     //constructeurs
     Transaction();
     Transaction(int,QString,QString,QString,QString,QString);
@@ -19,6 +20,10 @@ public:
     void set_categorie(QString n);
     void set_montant(QString n);
     void set_dateTransaction(QString n);
+    bool ajouter();
+    bool supprimer(int);
+    QSqlQueryModel* afficher();
+
 
     //getters
     int get_id();
@@ -27,6 +32,7 @@ public:
     QString get_categorie();
     QString get_montant();
     QString get_dateTransaction();
+    Transaction(QString,QString,QString,QString,QString);
 
     //CRUD
     bool ajouterTransaction();
@@ -34,12 +40,7 @@ public:
     bool supprimerTransaction(int);
     bool modifierTransaction(int id, const QString &modeDePaiement, const QString &type, const QString &categorie, const QString &dateTransaction, const QString &montant);
 
-    //controle de saisie
-    bool montantIsNumeric();
-    bool isValidModeDePaiement();
-    bool isValidDateTransaction();
-    bool isValidCategorie();
-    bool isValidType();
+
 
 private:
 
@@ -48,5 +49,4 @@ private:
 
 
 };
-
 #endif // TRANSACTION_H

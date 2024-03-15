@@ -3,7 +3,9 @@
 
 #include <QMainWindow>
 #include <QSqlQueryModel>
+#include <QComboBox>
 #include "transaction.h"
+#include "notification.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,34 +18,47 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    //MISE A JOUR DE LA TABLE
+    void update_table_de_transactions();
+
+    //NOTIFICATIONS
+    void afficherListeNotifications();
+    void setupListView();
 
 private slots:
-    void on_pushButton_ajouter_clicked(); //boutton d'ajout
-    void on_pushButton_supprimer_clicked(); // boutton de suppression
-    void on_pushButton_modifier_clicked(); //boutton de modification
-    void updateTableWidget(); // Rename the slot to match the implementation
+
+    //BOUTTON D'AJOUT, AFFICHAGE ET SUPPRESSION
+    void on_pushButton_Ajout_Transaction_clicked();
+    void on_pushButton_Suppression_Transaction_clicked();
+    void on_pushButton_Modification_Transaction_clicked();
+    void on_pushButton_Annuler_Transaction_clicked();
 
 
-    void on_pushButton_Ajout_clicked();
+    //METIERS STANDARDS : TRI PAR DATE/MONTANT, EXPORTATION EXCEL ET RECHERCHE PAR MONTANT
+    void on_Button_trierParDate_Transaction_clicked();
+    void on_pushButton_exportationFormatExcel_Transaction_clicked();
+    void on_Button_TrierParMontant_Transaction_clicked();
+    void searchTransactionsByAmount_Transaction(const QString &amount);
 
-    void on_pushButton_clicked();
 
-    void on_pushButton_2_clicked();
+    //CONTROLE DE SAISIE AVANCE
+    bool eventFilter(QObject *obj, QEvent *event);
+    void preventCellEdit_Transactions();
+    void showEditChoices_Transactions(int row, int column);
+    void showChoicesUnderCell_Transactions(int row, int column, const QStringList &choices);
+    void handleCellClicked_Transactions(int row, int column);
+    void editMontantCell_Transactions(int row, int column);
 
-    void on_Button_trierParDate_clicked();
 
-    void on_pushButton_exportationFormatExcel_clicked();
 
-    void on_Button_filtrer_2_clicked();
-
-    void on_Button_chercherParID_clicked();
 
 signals:
-    void dataUpdated(); // Declare the dataUpdated signal
+    void signal_table_de_transaction_mise_a_jour(); // Declare the dataUpdated signal
 private:
     Ui::MainWindow *ui;
     Transaction Etmp;
     QSqlQueryModel *model; // Declare a member variable for the model
+    SortedStringListModel *listeNotifications_Transactions;
 };
 
 #endif // MAINWINDOW_H
