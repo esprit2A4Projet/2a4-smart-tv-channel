@@ -29,13 +29,13 @@ public:
     void setcategorie(QString n);
     void setdate_pod(QString n);
 
-    bool ajouter();
-    QSqlQueryModel * afficher();
-    bool supprimer(int );
+    bool ajouterp();
+    QSqlQueryModel * afficherp();
+    bool supprimerp(QString);
     //bool update(int);
-    bool update(int id, const QString& nom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod);
-    QSqlQueryModel* Rechercher(int id);
-    QSqlQueryModel* tri();
+    bool update(int, const QString& nom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod);
+    QSqlQueryModel* Rechercherp(const QString& nom);
+    QSqlQueryModel* trip();
 
 };
 

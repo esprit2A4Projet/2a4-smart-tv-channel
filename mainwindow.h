@@ -21,21 +21,22 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_ajouter_clicked();
+    void on_pushButton_ajouterpod_clicked();
 
-    void on_pushButton_annuler_clicked();
+    void on_pushButton_annulerpod_clicked();
 
-    void on_pushButton_supprimer_clicked();
+    void on_pushButton_supprimerpod_clicked();
 
-    void on_pushButton_modifier_clicked();
+    void on_pushButton_modifierpod_clicked();
 
     void on_pushButton_expo_clicked();
 
     void on_pushButton_historique_clicked();
 
-    void on_pushButton_recherche_clicked();
+    void on_pushButton_recherchep_clicked();
 
-    void on_pushButton_trier_clicked();
+    void on_pushButton_trierpod_clicked();
+
 
 private:
     Ui::MainWindow *ui;

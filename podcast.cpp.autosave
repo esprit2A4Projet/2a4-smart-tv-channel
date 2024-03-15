@@ -71,10 +71,6 @@ QSqlQueryModel* podcast::afficherp(){
  return model;
 }
 
-bool podcast::nomExisteDeja(const QString &nom) const {
-    // Logique pour vérifier si le nom existe déjà dans la base de données
-    // Retourner true si le nom existe, sinon retourner false
-}
 
 bool podcast::supprimerp(QString)
 {

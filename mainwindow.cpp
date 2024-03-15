@@ -11,7 +11,6 @@
 #include <QThread>
 #include <QDebug>
 #include <QTextStream>
-
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
@@ -29,15 +28,27 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->lineEdit_nomp->setValidator(new QRegExpValidator(QRegExp("[A-Za-z ]+"), this));
+    //ui->lineEdit_categoriep->setValidator(new QRegExpValidator(QRegExp("[A-Za-z ]+"), this));
+    ui->lineEdit_dureep->setValidator(new QRegExpValidator(QRegExp("[0-9]*\\.?([0-9]+)?"), this));
+    //ui->lineEdit_7p->setValidator(new QIntValidator(0, 99999999, this));
+    //ui->lineEdit_8p->setValidator(new QIntValidator(0, 99999999, this));
 
-    podcast E;
+    ui->comboBoxp->addItem("Education");
+    ui->comboBoxp->addItem("Sports");
+    ui->comboBoxp->addItem("Finance");
+    ui->comboBoxp->addItem("Politiques");
+
+
+    podcast p;
 
            model = new QStandardItemModel(this);
-            ui->tableView->setModel(model);
+            ui->tableViewp->setModel(model);
 
-              model->setColumnCount(5); // Nous avons 5 colonnes dans notre TableView
-                 model->setHorizontalHeaderLabels({"ID", "Nom", "Duree", "Lieu", "Categorie", "Date"});
-                 ui->tableView->setModel(model);
+              model->setColumnCount(5); // Nous avons 5 colonnes dans notre tableViewp
+                 model->setHorizontalHeaderLabels({"ID", "Nom du Podcast", "Duree (min)", "Lieu", "Categorie", "Date Podcast"});
+                 ui->tableViewp->setModel(model);
+                 ui->tableViewp->hideColumn(0);
 }
 
 
@@ -46,14 +57,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_ajouter_clicked()
+void MainWindow::on_pushButton_ajouterpod_clicked()
 {
-    QString nom = ui->lineEdit_nom->text();
-    QString duree = ui->lineEdit_duree->text();
-    QString lieu = ui->lineEdit_lieu->text();
-    QString categorie = ui->lineEdit_categorie->text();
-    QString date_pod = ui->dateEdit->text();
-    int id = ui->lineEdit_7->text().toInt(); // Assuming this is the employee ID
+
+    /*
+    QString nom = ui->lineEdit_nomp->text();
+    QString duree = ui->lineEdit_dureep->text();
+    QString lieu = ui->lineEdit_lieup->text();
+    //QString categorie = ui->lineEdit_categoriep->text();
+    QString categorie = ui->comboBoxp->currentText();
+    QString date_pod = ui->dateEditp->text();
+    int id = ui->lineEdit_7p->text().toInt(); // Assuming this is the employee ID
 
     // Vérifier si les champs obligatoires sont vides
     if (nom.isEmpty() || duree.isEmpty() || lieu.isEmpty() || categorie.isEmpty() || date_pod.isEmpty()) {
@@ -68,11 +82,11 @@ void MainWindow::on_pushButton_ajouter_clicked()
 
     if (id == 0) {
          // Si l'ID est 0, cela signifie que nous ajoutons un nouvel enregistrement
-         success = p.ajouter();
+         success = p.ajouterp();
     } else {
          // Sinon, nous mettons à jour un enregistrement existant
          success = p.update(id,nom, duree, lieu, categorie, date_pod);
-         ui->lineEdit_7->clear();
+         ui->lineEdit_7p->clear();
          QMessageBox::information(nullptr, QObject::tr("OK"),
                        QObject::tr("Modification  effectué\n"
                                    "Click Cancel to exit."), QMessageBox::Cancel);
@@ -80,12 +94,12 @@ void MainWindow::on_pushButton_ajouter_clicked()
    QMessageBox msgBox;
     if (success) {
       //  msgBox.setText("Operation successful.");
-        ui->tableView->setModel(p.afficher());
-        ui->lineEdit_nom->clear();
-        ui->lineEdit_duree->clear();
-        ui->lineEdit_lieu->clear();
-        ui->lineEdit_categorie->clear();
-        ui->dateEdit->clear();
+        ui->tableViewp->setModel(p.afficherp());
+        ui->lineEdit_nomp->clear();
+        ui->lineEdit_dureep->clear();
+        ui->lineEdit_lieup->clear();
+        //ui->lineEdit_categoriep->clear();
+        ui->dateEditp->clear();
     } else {
         msgBox.setText("Operation failed.");
           msgBox.exec();
@@ -96,109 +110,120 @@ void MainWindow::on_pushButton_ajouter_clicked()
         QMessageBox::warning(this, "Warning", "Invalid duree format. veuillez entrez des numeros.");
         return;
     }
+    */
+
 }
 
-void MainWindow::on_pushButton_annuler_clicked()
+void MainWindow::on_pushButton_annulerpod_clicked()
 {
-    ui->lineEdit_nom->clear();
-    ui->lineEdit_duree->clear();
-    ui->lineEdit_lieu->clear();
-    ui->lineEdit_categorie->clear();
-    ui->dateEdit->clear();
+    ui->lineEdit_nomp->clear();
+    ui->lineEdit_dureep->clear();
+    ui->lineEdit_lieup->clear();
+    //ui->lineEdit_categoriep->clear();
+    ui->dateEditp->clear();
 }
 
-
-void MainWindow::on_pushButton_supprimer_clicked()
-{
-    int id = ui->lineEdit_7->text().toInt();
-       // Obtenez l'ID entré
-          podcast p;
-          QSqlQuery query;
-          query.prepare("SELECT id_podcast,nom, duree, lieu, categorie, date_pod FROM PODCASTS WHERE id_podcast = ?");
-          query.addBindValue(id);
-
-          if (query.exec() && query.next()) {
-              // Récupérez les valeurs de la requête
-              QString nom = query.value(0).toString();
-              QString duree = query.value(1).toString();
-              QString lieu = query.value(2).toString();
-              QString categorie = query.value(2).toString();
-              QString date_pod = query.value(4).toString();
-
-
-              podcast(nom,duree,lieu,categorie,date_pod);
-          // Récupérer les informations du podcast pour l'ID donné
-          if (p.supprimer((id))) {
-               ui->tableView->setModel(p.afficher());
-              QMessageBox::information(nullptr, QObject::tr("OK"),
-                            QObject::tr("Suppression  effectué\n"
-                                        "Click Cancel to exit."), QMessageBox::Cancel);
-              } else {
-                  // Afficher un message indiquant que le podcast est introuvable
-                  QMessageBox::critical(nullptr, QObject::tr("Erreur"),
-                                        QObject::tr("Podcast inexistant.\n"
-                                                    "Cliquez sur Cancel pour quitter."), QMessageBox::Cancel);
-              }
-          } else {
-              // Afficher un message indiquant que le podcast est introuvable
-              QMessageBox::critical(nullptr, QObject::tr("Error"),
-                                    QObject::tr("Podcast inexistant.\n"
-                                                "Click sur Cancel pour quitter."), QMessageBox::Cancel);
-}
-}
-
-
-void MainWindow::on_pushButton_modifier_clicked()
+void MainWindow::on_pushButton_supprimerpod_clicked()
 {
 
-        int id = ui->lineEdit_7->text().toInt();
-        // Obtenez l'ID entré
-        podcast p;
-        QSqlQuery query;
-        query.prepare("SELECT id_podcast, nom, duree, lieu, categorie, date_pod FROM PODCASTS WHERE id_podcast = ?");
-        query.addBindValue(id);
+    QString nom = ui->lineEdit_7p->text();
+    // Obtenez le nom entré
 
-        if (query.exec() && query.next()) {
-            // Récupérez les valeurs de la requête
-            QString nom = query.value(1).toString();
-            QString duree = query.value(2).toString();
-            QString lieu = query.value(3).toString();
-            QString categorie = query.value(4).toString();
-            QString date_pod = query.value(5).toString();
+    podcast p;
+    QSqlQuery query;
+    //query.prepare("SELECT id_podcast, nom, duree, lieu, categorie, date_pod FROM PODCASTS WHERE nom = ?");
+    query.prepare("SELECT nom FROM PODCASTS WHERE nom = ?");
+    query.addBindValue(nom);
 
-            // Affichez les informations du podcast dans les champs de saisie pour permettre la modification
-            ui->lineEdit_nom->setText(nom);
-            ui->lineEdit_duree->setText(duree);
-            ui->lineEdit_lieu->setText(lieu);
-            ui->lineEdit_categorie->setText(categorie);
-            ui->dateEdit->setDate(QDate::fromString(date_pod, "yyyy-MM-dd"));
+    if (query.exec() && query.next()) {
+        // Récupérez les valeurs de la requête
+        //int id = query.value(0).toInt(); // Récupérez l'ID du podcast pour la suppression
+        QString nom = query.value(0).toString();
+        QString duree = query.value(1).toString();
+        QString lieu = query.value(2).toString();
+        QString categorie = query.value(2).toString();
+        QString date_pod = query.value(4).toString();
 
-            // Mettez à jour le podcast avec les nouvelles valeurs si l'utilisateur modifie les champs et appuie sur un bouton de confirmation
-            if (ui->pushButton_ajouter->isEnabled()) {
-                QString newNom = ui->lineEdit_nom->text();
-                QString newDuree = ui->lineEdit_duree->text();
-                QString newLieu = ui->lineEdit_lieu->text();
-                QString newCategorie = ui->lineEdit_categorie->text();
-                QString newDatePod = ui->dateEdit->text();
 
-                if (p.update(id, newNom, newDuree, newLieu, newCategorie, newDatePod)) {
-                    ui->tableView->setModel(p.afficher());
-                    QMessageBox::information(nullptr, QObject::tr("OK"),
-                                             QObject::tr("Modification effectuée.\n"
-                                                         "Cliquez sur Cancel pour quitter."), QMessageBox::Cancel);
-                } else {
-                    QMessageBox::critical(nullptr, QObject::tr("Erreur"),
-                                          QObject::tr("Échec de la modification du podcast.\n"
-                                                      "Cliquez sur Cancel pour quitter."), QMessageBox::Cancel);
-                }
-            }
+        // Utilisez les valeurs récupérées pour instancier un objet podcast
+        p = podcast(nom, duree, lieu, categorie, date_pod);
+
+        // Supprimer le podcast
+        if (p.supprimerp(nom)) {
+            ui->tableViewp->setModel(p.afficherp());
+            QMessageBox::information(nullptr, QObject::tr("OK"),
+                QObject::tr("Suppression effectuée\n"
+                "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
         } else {
+            // Afficher un message indiquant que le podcast est introuvable
             QMessageBox::critical(nullptr, QObject::tr("Erreur"),
-                                  QObject::tr("Podcast introuvable.\n"
-                                              "Cliquez sur Cancel pour quitter."), QMessageBox::Cancel);
+                QObject::tr("Podcast inexistant.\n"
+                "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
         }
+    } else {
+        // Afficher un message indiquant que le podcast est introuvable
+        QMessageBox::critical(nullptr, QObject::tr("Erreur"),
+            QObject::tr("Podcast inexistant.\n"
+            "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
     }
+}
 
+
+
+void MainWindow::on_pushButton_modifierpod_clicked()
+{
+    QString nom = ui->lineEdit_7p->text();
+    // Obtenez le nom entré
+
+    podcast p;
+    QSqlQuery query;
+    query.prepare("SELECT  nom, duree, lieu, categorie, date_pod FROM PODCASTS WHERE nom = ?");
+    query.addBindValue(nom);
+
+    if (query.exec() && query.next()) {
+        // Récupérez les valeurs de la requête
+       // int id = query.value(0).toInt(); // Récupérez le nom du podcast pour la modification
+        QString nom = query.value(0).toString();
+        QString duree = query.value(1).toString();
+        QString lieu = query.value(2).toString();
+        QString categorie = query.value(2).toString();
+        QString date_pod = query.value(4).toString();
+
+        // Affichez les informations du podcast dans les champs de saisie pour permettre la modification
+        ui->lineEdit_nomp->setText(nom);
+        ui->lineEdit_dureep->setText(duree);
+        ui->lineEdit_lieup->setText(lieu);
+        //ui->lineEdit_categoriep->setText(categorie);
+        ui->comboBoxp->setCurrentText(categorie);
+        ui->dateEditp->setDate(QDate::fromString(date_pod, "yyyy-MM-dd"));
+
+        // Mettez à jour le podcast avec les nouvelles valeurs si l'utilisateur modifie les champs et appuie sur un bouton de confirmation
+        if (ui->pushButton_ajouterpod->isEnabled()) {
+            QString newNom = ui->lineEdit_nomp->text();
+            QString newDuree = ui->lineEdit_dureep->text();
+            QString newLieu = ui->lineEdit_lieup->text();
+            //QString newCategorie = ui->lineEdit_categoriep->text();
+            QString newDatePod = ui->dateEditp->text();
+
+            /*
+            if (p.update(nom, newNom, newDuree, newLieu, newCategorie, newDatePod)) {
+                ui->tableViewp->setModel(p.afficherp());
+                */
+                QMessageBox::information(nullptr, QObject::tr("OK"),
+                                         QObject::tr("Modification effectuée.\n"
+                                                     "Cliquez sur Cancel pour quitter."), QMessageBox::Cancel);
+            } else {
+                QMessageBox::critical(nullptr, QObject::tr("Erreur"),
+                                      QObject::tr("Échec de la modification du podcast.\n"
+                                                  "Cliquez sur Cancel pour quitter."), QMessageBox::Cancel);
+            }
+        }
+     else {
+        QMessageBox::critical(nullptr, QObject::tr("Erreur"),
+                              QObject::tr("Podcast introuvable.\n"
+                                          "Cliquez sur Cancel pour quitter."), QMessageBox::Cancel);
+    }
+}
 
 
 void MainWindow::on_pushButton_expo_clicked()
@@ -280,12 +305,13 @@ void MainWindow::on_pushButton_historique_clicked()
 
     // Ajout des informations de modification dans l'historique
     historyText += "Timestamp : " + timestamp + "\n";
-    historyText += "ID du podcast modifié : " + ui->lineEdit_7->text() + "\n";
-    historyText += "Nouveau nom : " + ui->lineEdit_nom->text() + "\n";
-    historyText += "Nouvelle durée : " + ui->lineEdit_duree->text() + "\n";
-    historyText += "Nouveau lieu : " + ui->lineEdit_lieu->text() + "\n";
-    historyText += "Nouvelle catégorie : " + ui->lineEdit_categorie->text() + "\n";
-    historyText += "Nouvelle date du podcast : " + ui->dateEdit->text() + "\n";
+    historyText += "ID du podcast modifié : " + ui->lineEdit_7p->text() + "\n";
+    historyText += "Nouveau nom : " + ui->lineEdit_nomp->text() + "\n";
+    historyText += "Nouvelle durée : " + ui->lineEdit_dureep->text() + "\n";
+    historyText += "Nouveau lieu : " + ui->lineEdit_lieup->text() + "\n";
+    //historyText += "Nouvelle catégorie : " + ui->lineEdit_categoriep->text() + "\n";
+    historyText += "Nouvelle catégorie : " + ui->comboBoxp->currentText() + "\n";
+    historyText += "Nouvelle date du podcast : " + ui->dateEditp->text() + "\n";
     historyText += "-------------------------------------\n\n";
 
     // Écriture de l'historique dans le fichier texte
@@ -299,67 +325,56 @@ void MainWindow::on_pushButton_historique_clicked()
     QMessageBox::information(this, "Historique enregistré", "L'historique des modifications a été enregistré avec succès dans le fichier.");
 }
 
-
-void MainWindow::on_pushButton_recherche_clicked() // chercher
+void MainWindow::on_pushButton_recherchep_clicked()
 {
     podcast p;
 
-    int id = ui->lineEdit_8->text().toInt();
-   // Obtenez l'ID entré
-    if (id > 0 && id < 99999999)
-    {
-      QSqlQuery query;
-      query.prepare("SELECT id,nom, duree, lieu, categorie, poste FROM PODCASTS WHERE id = ?");
-      query.addBindValue(id);
+    QString nom = ui->lineEdit_8p->text(); // Obtenez le nom entré
 
-      if (query.exec() && query.next()) {
-          // Récupérez les valeurs de la requête
-          QString nom = query.value(0).toString();
-          QString duree = query.value(1).toString();
-          QString lieu = query.value(2).toString();
-          QString categorie = query.value(2).toString();
-          QString date_pod = query.value(4).toString();
+    QSqlQuery query;
+    query.prepare("SELECT nom, duree, lieu, categorie, date_pod FROM PODCASTS WHERE nom = ?");
+    query.addBindValue(nom);
 
+    if (query.exec() && query.next()) {
+        // Récupérez les valeurs de la requête
+        QString nom = query.value(0).toString();
+        QString duree = query.value(1).toString();
+        QString lieu = query.value(2).toString();
+        QString categorie = query.value(3).toString();
+        QString date_pod = query.value(4).toString();
 
-          podcast(nom,duree,lieu,categorie,date_pod);
-          if (p.Rechercher(id)) {
-               ui->tableView->setModel(p.Rechercher(id));
-              QMessageBox::information(nullptr, QObject::tr("OK"),
-                            QObject::tr("podcast  Trouvé\n"
-                                        "Click Cancel to exit."), QMessageBox::Cancel);
-              } else {
-                  // Afficher un message indiquant que le podcast est introuvable
-                  QMessageBox::critical(nullptr, QObject::tr("Erreur"),
-                                        QObject::tr("podcast inexistant.\n"
-                                                    "Cliquez sur Cancel pour quitter."), QMessageBox::Cancel);
-              }
-          } else {
-              // Afficher un message indiquant que le podcast est introuvable
-              QMessageBox::critical(nullptr, QObject::tr("Error"),
-                                    QObject::tr("podcast inexistant.\n"
-                                                "Click sur Cancel pour quitter."), QMessageBox::Cancel);
-          }
+        // Affichez les informations récupérées où vous le souhaitez, par exemple :
+        qDebug() << "Nom du podcast:" << nom;
+        qDebug() << "Durée:" << duree;
+        qDebug() << "Lieu:" << lieu;
+        qDebug() << "Catégorie:" << categorie;
+        qDebug() << "Date du podcast:" << date_pod;
+
+        // Maintenant, affichez ces informations dans votre TableView
+        // Vous pouvez les mettre dans un modèle ou directement dans votre TableView
 
 
-    ui->lineEdit_8->clear();
-    }
-    else
-    {
-        // Afficher un message indiquant que l'ID n'est pas valide
+        QMessageBox::information(nullptr, QObject::tr("OK"),
+                        QObject::tr("Podcast trouvé.\n"
+                                    "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
+    } else {
+        // Afficher un message indiquant que le podcast est introuvable
         QMessageBox::critical(nullptr, QObject::tr("Erreur"),
-                            QObject::tr("Veuillez saisir un entier valide.\n"
-                                        "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
+                                QObject::tr("Podcast introuvable.\n"
+                                            "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
     }
+
+    ui->lineEdit_8p->clear();
 }
 
 
-void MainWindow::on_pushButton_trier_clicked() //tri
+void MainWindow::on_pushButton_trierpod_clicked() //tri
 {
     podcast p;
 
-      ui->tableView->setModel(p.tri());
+      ui->tableViewp->setModel(p.trip());
 
-      bool test=p.tri();
+      bool test=p.trip();
       if(test){
           QMessageBox::information(nullptr,QObject::tr("OK"),
                                    QObject::tr("tri effectué. \n"
@@ -375,138 +390,4 @@ void MainWindow::on_pushButton_trier_clicked() //tri
 }
 
 
-/*
 
-QString filePath = QFileDialog::getSaveFileName(this, "Export to Excel", QString(), "CSV Files (*.csv)");
-
-if (filePath.isEmpty())
-    return;
-
-QFile file(filePath);
-if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    qDebug() << "Failed to open file for writing.";
-    return;
-}
-
-QTextStream out(&file);
-
-// Write header
-QStringList headerData = {"Nom", "Duree", "Lieu", "Categorie", "Date_Pod"};
-out << headerData.join(",") << "\n";
-
-// Retrieve data from the database
-QSqlQuery query;
-if (!query.exec("SELECT nom, duree, lieu, categorie, date_pod FROM tableView")) {
-    qDebug() << "Error executing SQL query:" << query.lastError().text();
-    return;
-}
-
-// Write data to file
-while (query.next()) {
-    for (int col = 0; col < query.record().count(); ++col) {
-        out << query.value(col).toString();
-        if (col < query.record().count() - 1)
-            out << ",";
-    }
-    out << "\n";
-}
-
-file.close();
-
-qDebug() << "Database exported to Excel successfully.";
-
-*/
-
-
-/*
-* QString filePath = QFileDialog::getSaveFileName(this, "Export to Text File", QString(), "Text Files (*.txt)");
-
-    if (filePath.isEmpty())
-        return;
-
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "Failed to open file for writing.";
-        return;
-    }
-
-    QTextStream out(&file);
-
-    // Retrieve data from the database
-    QSqlQuery query;
-    if (!query.exec("SELECT nom, duree, lieu, categorie, date_pod FROM tableView")) {
-        qDebug() << "Error executing SQL query:" << query.lastError().text();
-        return;
-    }
-
-    // Write data to file
-    while (query.next()) {
-        for (int col = 0; col < query.record().count(); ++col) {
-            out << query.value(col).toString();
-            if (col < query.record().count() - 1)
-                out << "\t"; // Use tab as a delimiter for text file
-        }
-        out << "\n";
-    }
-
-    file.close();
-
-    qDebug() << "Database exported to text file successfully.";
-
-    */
-
-/*
-
-QString filePath = QFileDialog::getSaveFileName(this, "Export to Excel", QString(), "Excel Files (*.xlsx)");
-
-if (filePath.isEmpty())
-    return;
-
-QAxObject *excel = new QAxObject("Excel.Application", this);
-
-if (excel->isNull()) {
-    // Handle the case when Excel is not available
-    delete excel;
-    return;
-}
-
-QAxObject *workbooks = excel->querySubObject("Workbooks");
-QAxObject *workbook = workbooks->querySubObject("Add()");
-QAxObject *worksheets = workbook->querySubObject("Worksheets(int)", 1);
-QAxObject *worksheet = worksheets->querySubObject("Cells(int, int)", 1, 1);
-
-QStringList headerData = {"Nom", "Duree", "Lieu", "Categorie", "Date"}; // New header names
-
-// Write headers
-int col = 1;
-foreach (const QString &header, headerData)
-{
-    worksheet->querySubObject("Cells(int, int)", 1, col++)->setProperty("Value", header);
-}
-
-// Write data
-int row = 2; // Start from the second row
-
-QString nom = ui->lineEdit_nom->text();
-QString duree = ui->lineEdit_duree->text();
-QString lieu = ui->lineEdit_lieu->text();
-QString categorie = ui->lineEdit_categorie->text();
-QString date_pod = ui->dateEdit->text();
-
-worksheet->querySubObject("Cells(int, int)", row, 1)->setProperty("Value", nom);
-worksheet->querySubObject("Cells(int, int)", row, 2)->setProperty("Value", duree);
-worksheet->querySubObject("Cells(int, int)", row, 3)->setProperty("Value", lieu);
-worksheet->querySubObject("Cells(int, int)", row, 4)->setProperty("Value", categorie);
-worksheet->querySubObject("Cells(int, int)", row, 5)->setProperty("Value", date_pod);
-
-workbook->dynamicCall("SaveAs(const QString&)", filePath);
-workbook->dynamicCall("Close()");
-excel->dynamicCall("Quit()");
-
-// Introduce a delay before deleting or moving the file
-//QThread::msleep(1000); // 1000 milliseconds (1 second) delay
-
-delete excel;
-
-qDebug() << "Debug Information";
-*/
