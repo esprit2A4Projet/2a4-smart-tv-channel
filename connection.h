@@ -10,6 +10,6 @@ class Connection
 public:
     Connection();
     bool createconnect();
-    bool insertData(int id, const QString &nom, const QString &type, const QString &etat, const QString &quantite, const QString &date);
+    bool insertDataM(const QString &nom, const QString &type, const QString &etat, const QString &quantite, const QString &date);
 };
 #endif // CONNECTION_H

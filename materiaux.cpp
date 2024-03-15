@@ -1,20 +1,24 @@
-#include "Materiaux.h"
-#include <QDebug>
 #include <QSqlError>
+#include <QTableWidget>
+#include <QDebug>
+#include <QObject>
+#include <QSqlQuery>
+#include <QSqlQueryModel>
+#include "connection.h"
+#include "Materiaux.h"
 
-
-
+//---------------------------------------------------les constructeurs---------------------------------------------------//
 Materiaux::Materiaux()
 {
     id=0;
-    nom="";
-    type="";
-    etat="";
-    quantite="";
-    date="";
-
+    nom=""; //datetransaction
+    type=""; //montant
+    etat=""; //modeDePaiement
+    quantite="";//categorie
+    date="";//type
 }
-Materiaux::Materiaux(int id,QString nom,QString type,QString etat,QString quantite,QString date)
+
+Materiaux::Materiaux(int id, QString nom, QString type, QString etat, QString quantite, QString date)
 {
     this->id=id;
     this->nom=nom;
@@ -23,106 +27,147 @@ Materiaux::Materiaux(int id,QString nom,QString type,QString etat,QString quanti
     this->quantite=quantite;
     this->date=date;
 }
-void Materiaux::setid(int n) { id = n; }
-void Materiaux::setnom(QString n){nom=n;}
-void Materiaux::settype(QString n){type=n;}
-void Materiaux::setetat(QString n){etat=n;}
-void Materiaux::setquantite(QString n){quantite=n;}
-void Materiaux::setdate(QString n){date=n;}
+//-////////////////////////////////////////////////////////////////////////////////////////////////////////////-//
 
 
+
+
+
+
+//---------------------------------------------------fonction d'ajout--------------------------------------------------------//
+bool Materiaux::ajouterMateriaux()
+{
+    Connection c;
+    if (c.createconnect())
+    {
+        return c.insertDataM(nom, type, etat, quantite, date);
+
+    }
+    return false;
+}
+
+//-////////////////////////////////////////////////////////////////////////////////////////////////////////////-//
+
+
+
+
+
+
+
+//---------------------------------------------------fonction d'affichage---------------------------------------------------------//
+void Materiaux::afficherMateriaux(QTableWidget *tableWidget)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+        db.setDatabaseName("Source_Projet2A4");
+        db.setUserName("amine");
+        db.setPassword("amine");
+        db.open();
+        QSqlQuery query(db);
+        QString str = ("SELECT * FROM MATERIAUX");
+        if (query.exec(str))
+        {
+            tableWidget->setColumnCount(6);
+            QStringList labelsM;
+            labelsM<<"ID"<<"Nom"<<"Type"<<"Etat"<<"Quantite"<<"Date";
+            tableWidget->setHorizontalHeaderLabels(labelsM);
+            int RowNumber=0;
+            while(query.next())
+            {
+                tableWidget->insertRow(RowNumber);
+                QTableWidgetItem *id= new QTableWidgetItem;
+                QTableWidgetItem *nom= new QTableWidgetItem;
+                QTableWidgetItem *type= new QTableWidgetItem;
+                QTableWidgetItem *etat= new QTableWidgetItem;
+                QTableWidgetItem *quantite= new QTableWidgetItem;
+                QTableWidgetItem *date= new QTableWidgetItem;
+
+                id->setText(query.value(0).toString());
+                nom->setText(query.value(1).toString());
+                type->setText(query.value(2).toString());
+                etat->setText(query.value(3).toString());
+                quantite->setText(query.value(4).toString());
+                date->setText(query.value(5).toString());
+
+                tableWidget->setItem(RowNumber,0,id);
+                tableWidget->setItem(RowNumber,1,nom);
+                tableWidget->setItem(RowNumber,2,type);
+                tableWidget->setItem(RowNumber,3,etat);
+                tableWidget->setItem(RowNumber,4,quantite);
+                tableWidget->setItem(RowNumber,5,date);
+                RowNumber++;
+            }
+        }
+        db.close();
+}
+//-////////////////////////////////////////////////////////////////////////////////////////////////////////////-//
+
+
+
+
+
+
+
+//---------------------------------------------------fonction de suppression----------------------------------------------------//
+bool Materiaux::supprimerMateriaux(int id)
+{
+        QSqlQuery query;
+        query.prepare("DELETE FROM MATERIAUX WHERE ID_MATERIEL = :id");
+        query.bindValue(":id", id);
+
+        if (query.exec()) return true;
+        else
+        {
+            qDebug() << "Error deleting data:" << query.lastError().text();
+            return false;
+        }
+}
+//-////////////////////////////////////////////////////////////////////////////////////////////////////////////-//
+
+
+
+
+
+
+
+
+
+//---------------------------------------------------fonction de modification----------------------------------------------------//
+bool Materiaux::modifierMateriaux(int id, const QString& nom, const QString& type, const QString& etat, const QString& quantite, const QString& date)
+{
+    QSqlQuery query;
+
+        query.prepare("UPDATE MATERIAUX SET NOM = :nom, TYPE = :type, ETAT = :etat, QUANTITE = :quantite, DATE_MISE = :date WHERE ID_MATERIEL = :id");
+        query.bindValue(":id", id);
+        query.bindValue(":nom", nom);
+        query.bindValue(":type", type);
+        query.bindValue(":etat", etat);
+        query.bindValue(":quantite", quantite);
+        query.bindValue(":date", date);
+
+        if (!query.exec())
+        {
+            qDebug() << "Erreur de mise à jour du materiel : " << query.lastError().text();
+            return false;
+        }
+
+        return true;
+}
+//-////////////////////////////////////////////////////////////////////////////////////////////////////////////-//
+
+
+
+//setters
+void Materiaux::set_nom(QString n){nom=n;}
+void Materiaux::set_type(QString n){type=n;}
+void Materiaux::set_etat(QString n){etat=n;}
+void Materiaux::set_quantite(QString n){quantite=n;}
+void Materiaux::set_date(QString n){date=n;}
+
+
+//getters
 QString Materiaux::get_nom(){return nom;}
 QString Materiaux::get_type(){return type;}
 QString Materiaux::get_etat(){return etat;}
 QString Materiaux::get_quantite(){return quantite;}
 QString Materiaux::get_date(){return date;}
-int Materiaux::get_id() { return id; }
-
-bool Materiaux::ajouter()
-{
-    QSqlQuery query;
-    //QString res = QString::number(id);
-    query.prepare("insert into Materiaux (id,nom,type,etat,quantite,date)" "values (:nom, :type, :etat, :quantite, :date)");
-    query.bindValue(":id",id);
-    query.bindValue(":nom",nom);
-    query.bindValue("type",type);
-    query.bindValue("etat",etat);
-    query.bindValue("quantite",quantite);
-    query.bindValue("date",date);
-
-    return query.exec();
-}
-/*bool Materiaux::supprimer(int id)
-{
-    QSqlQuery query;
-    //QString res=id;
-    query.prepare("Delete from materiaux where ID_MATERIEL= :id");
-    query.bindValue(":id",id);
-    return query.exec();
-}*/
-
-QSqlQueryModel* Materiaux::afficher()
-{
-   QSqlQueryModel* model=new QSqlQueryModel();
-
-         model->setQuery("SELECT* FROM MATERIAUX");
-         model->setHeaderData(0, Qt::Horizontal, QObject:: tr("id"));
-         model->setHeaderData(1, Qt::Horizontal, QObject:: tr("nom"));
-         model->setHeaderData(2, Qt::Horizontal, QObject:: tr("type"));
-         model->setHeaderData(3, Qt::Horizontal, QObject:: tr("etat"));
-         model->setHeaderData(4, Qt::Horizontal, QObject:: tr("quantite"));
-         model->setHeaderData(5, Qt::Horizontal, QObject:: tr("date"));
- return model;
-}
-
-bool Materiaux::supprimer(int id) {
-    QSqlQuery query;
-    query.prepare("DELETE FROM MATERIAUX WHERE ID_MATERIEL = :id");
-    query.bindValue(":id", id);
-    if (query.exec()) {
-        qDebug() << "Suppression réussie.";
-        return true;
-    } else {
-        qDebug() << "Échec de la suppression :" << query.lastError().text();
-        return false;
-    }
-}
-
-/*bool Materiaux::update(int id) {
-    QSqlQuery query;
-    query.prepare("UPDATE MATERIAUX SET NOM = :nom, TYPE = :type, ETAT = :etat, QUANTITE = :quantite, DATE_MISE = :date WHERE ID_MATERIEL = :id");
-    query.bindValue(":id", id);
-    query.bindValue(":nom", nom);
-    query.bindValue(":type", type);
-    query.bindValue(":etat", etat);
-    query.bindValue(":quantite", quantite);
-    query.bindValue(":date", date);
-
-    if (query.exec()) {
-        qDebug() << "Mise à jour réussie.";
-        return true;
-    } else {
-        qDebug() << "Échec de la mise à jour :" << query.lastError().text();
-        return false;
-    }
-}*/
-
-bool Materiaux::update(int id, const QString& nom, const QString& type, const QString& etat, const QString& quantite, const QString& date)
-{
-    QSqlQuery query;
-    query.prepare("UPDATE MATERIAUX SET NOM = :nom, TYPE = :type, ETAT = :etat, QUANTITE = :quantite, DATE_MISE = :date WHERE ID_MATERIEL = :id");
-    query.bindValue(":id", id);
-    query.bindValue(":nom", nom);
-    query.bindValue(":type", type);
-    query.bindValue(":etat", etat);
-    query.bindValue(":quantite", quantite);
-    query.bindValue(":date", date);
-
-    if (query.exec()) {
-        return true; // La modification a réussi
-    } else {
-        qDebug() << "Erreur de mise à jour du materiel:" << query.lastError().text();
-        return false; // La modification a échoué
-    }
-}
 
