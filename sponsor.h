@@ -4,7 +4,10 @@
 #include <QSqlQuery>
 #include <QSqlQueryModel>
 #include <QTableWidget>
-
+#include <QtCharts>
+#include <QtCharts/QChartView>
+#include <QtCharts/QPieSeries>
+#include <QtCharts/QPieSlice>
 
 
 class Sponsor
@@ -40,8 +43,8 @@ public:
     bool modifier(int id_sponsor, const QString &nom, const QString &budget, const QString &pack, const QString &date_deb, const QString &date_fin, const QString &telephone);
     void rechercher(const QString &nomSponsor, QTableWidget *tableWidget);
     bool trierParPack(QTableWidget *tableWidgetS);
-
     void sendSMS(const QString& phoneNumber , const QString& message );
+
 
 
 

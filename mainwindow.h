@@ -3,6 +3,8 @@
 #include "sponsor.h"
 #include <QMainWindow>
 #include <QSqlQueryModel>
+#include <QListView>
+#include <QStringListModel>
 
 namespace Ui {
 class MainWindow;
@@ -38,12 +40,13 @@ private slots:
     void on_pushButton_annulerS2_clicked();
 
     void on_SMS_clicked();
+
     //control de saisie
     void validateNom(const QString &text);
     void validateBudget(const QString &text);
     //void validateDate(const QDate &startDate);
     void validateTelephone(const QString &text);
-    //bool eventFilter(QObject *obj, QEvent *event);
+    void statistiquesS();
 
 
 
@@ -52,6 +55,9 @@ signals:
 private:
     Ui::MainWindow *ui;
     QSqlQueryModel *model;
+    //dashboard
+
+
 };
 
 #endif // MAINWINDOW_H

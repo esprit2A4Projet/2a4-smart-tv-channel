@@ -22,7 +22,10 @@
 #include <QNetworkReply>
 #include <QCoreApplication>
 #include <QEvent>
-
+#include <QtCharts>
+#include <QtCharts/QChartView>
+#include <QtCharts/QPieSeries>
+#include <QtCharts/QPieSlice>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -50,13 +53,14 @@ MainWindow::MainWindow(QWidget *parent)
     //connect(ui->dateEdit_2, &QDateEdit::dateChanged, this, &MainWindow::validateDate);
     connect(ui->lineEdit_tel, &QLineEdit::textChanged, this, &MainWindow::validateTelephone);
 
-
+    statistiquesS();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 
 //control de saisie
 
@@ -78,14 +82,6 @@ void MainWindow::validateBudget(const QString &text)
     ui->label_BudgetError->setStyleSheet(isValid ? "" : "color: red;");
 
 }
-
-/*void MainWindow::validateDate(const QDate &endDate) {
-    bool isValid = endDate >= ui->dateEdit->date();
-
-    // Set visibility and style for date error labels
-    //ui->label_DateError->setVisible(!startDate.isValid());
-    ui->label_Date2Error->setVisible(!isValid);
-}*/
 
 void MainWindow::validateTelephone(const QString &text)
 {
@@ -152,7 +148,7 @@ void MainWindow::on_pushButton_annulerS_clicked()
        // Update the UI or clear the input fields if needed
        ui->lineEdit_nomS->clear();
        ui->lineEdit_budget->clear();
-       ui->comboBox_pack->clear();
+
        ui->dateEdit->clear();
        ui->dateEdit_2->clear();
        ui->lineEdit_tel->clear();
@@ -202,12 +198,12 @@ void MainWindow::on_pushButton_supprimerS_clicked()
             // Supprimer la ligne de l'affichage
             ui->tableWidget_S->removeRow(row);
             emit dataUpdated(); // Mettre à jour la vue après la suppression
-            QMessageBox::information(this, "Success", "Data deleted from the database.");
+            QMessageBox::information(this, "Succes", "Données supprimées de la base de données.");
         } else {
-            QMessageBox::critical(this, "Erreur", "Failed to delete data from the database.");
+            QMessageBox::critical(this, "Erreur", "Échec de la suppression des données de la base de données.");
         }
     } else {
-        QMessageBox::warning(this, "Warning", "Please select a row to delete.");
+        QMessageBox::warning(this, "Avertissement", "Veuillez sélectionner une ligne à supprimer.");
     }
 }
 
@@ -279,7 +275,7 @@ void MainWindow::on_pushButton_modifierS_clicked()
             ui->tableWidget_S->setItem(row, 6, new QTableWidgetItem(telephone));
 
             emit dataUpdated(); // Mettre à jour la vue après la modification
-            QMessageBox::information(this, "Success", "Données modifiées dans la base de données.");
+            QMessageBox::information(this, "Succes", "Données modifiées dans la base de données.");
         }
         else
         {
@@ -314,7 +310,7 @@ void MainWindow::on_pushButton_rechercherS_clicked()
     }
     else
     {
-        QMessageBox::warning(this, "Error", "Veuillez entrer un nom de sponsor pour la recherche.");
+        QMessageBox::warning(this, "Erreur", "Veuillez entrer un nom de sponsor pour la recherche.");
     }
 }
 
@@ -392,11 +388,11 @@ void MainWindow::on_PDF_clicked()
 void MainWindow::on_SMS_clicked()
 {
     Sponsor s;
-    QMessageBox::warning(this, "Success", "sms tenzal");
+    QMessageBox::warning(this, "Succes", "sms tenzal");
     qInfo()<< QSslSocket::sslLibraryBuildVersionString();
     QString message= ui->smsEdit->toPlainText();
 
-    QString phoneNumber = "+21656623537"; // Use the selected phone number from the table
+    QString phoneNumber = "+21656623537";
 
     // Call the function to send the SMS
     s.sendSMS(phoneNumber,message);
@@ -445,3 +441,54 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     return QObject::eventFilter(obj, event);
 }
 */
+
+void MainWindow::statistiquesS()
+{
+
+    Connection C;
+    C.createconnect();
+    QSqlQueryModel * model = new QSqlQueryModel();
+    model->setQuery("SELECT * FROM SPONSOR WHERE PACK='Bronze' ");
+    float exp1=model->rowCount();
+    model->setQuery("SELECT * FROM SPONSOR WHERE PACK='Silver' ");
+    float exp2=model->rowCount();
+    model->setQuery("SELECT * FROM SPONSOR WHERE PACK='Gold' ");
+    float exp3=model->rowCount();
+    float total=exp1+exp2+exp3;
+    QString a=QString("bronze "+ QString::number((exp1*100)/total,'f',2)+"%");
+    QString b=QString("silver "+ QString::number((exp2*100)/total,'f',2)+"%");
+    QString c=QString("gold "+ QString::number((exp3*100)/total,'f',2)+"%");
+    QPieSeries *series = new QPieSeries();
+        series->setHoleSize(0.3);
+        series->append(a, exp1);
+        series->append(b, exp2);
+        series->append(c, exp3);
+        if (exp1!=0)
+        {
+           QPieSlice *slice1 = series->slices().at(0);
+           //slice1->setExploded();
+           slice1->setLabelVisible();
+        }
+        if (exp2!=0)
+        {
+            QPieSlice *slice2 = series->slices().at(1);
+            slice2->setLabelVisible();
+        }
+        if (exp3!=0)
+        {
+            QPieSlice *slice3 = series->slices().at(2);
+            slice3->setExploded();
+            slice3->setLabelVisible();
+        }
+
+        QChart *chart = new QChart();
+        chart->addSeries(series);
+        chart->setAnimationOptions(QChart::SeriesAnimations);
+        chart->setTitle("Statistiques sur les packs des sponsors");
+        chart->setTheme(QChart::ChartThemeBlueCerulean);
+        QChartView *chartview = new QChartView(chart);
+        chartview->setRenderHint(QPainter::Antialiasing);
+        chartview->setParent(ui->statS);
+
+}
+
