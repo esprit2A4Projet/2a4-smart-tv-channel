@@ -16,6 +16,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+
 private slots:
     void updateTableWidget_S();
     void on_pushButton_ajouterS_clicked();
@@ -34,12 +35,17 @@ private slots:
 
     void on_pushButton_reset_clicked();
 
-    //void on_SMS_clicked();
+    void on_pushButton_annulerS2_clicked();
+
+    void on_SMS_clicked();
     //control de saisie
     void validateNom(const QString &text);
     void validateBudget(const QString &text);
     //void validateDate(const QDate &startDate);
     void validateTelephone(const QString &text);
+    //bool eventFilter(QObject *obj, QEvent *event);
+
+
 
 signals:
     void dataUpdated();

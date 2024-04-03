@@ -14,15 +14,14 @@
 #include <QPdfWriter>
 #include <QTextDocument>
 #include <QComboBox>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
 #include <QUrl>
 #include <QUrlQuery>
-#include <QObject>
-#include <QTcpSocket>
-#include <QSignalMapper>
-//#include <twilio-cpp/Rest.h>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QCoreApplication>
+#include <QEvent>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -390,126 +389,59 @@ void MainWindow::on_PDF_clicked()
 }
 
 
-/*void MainWindow::on_SMS_clicked(const QString& message)
-{
-    // Twilio Account SID, Auth Token, and Twilio phone number
-    QString accountSid = "AC7e920da38070c8ccc778abcd213cb528";
-    QString authToken = "a2cd619d4cbe94d226bc2d7e48c2722f";
-    QString twilioPhoneNumber = "+16505499759";
-
-    // Get selected phone number from the QTableWidget
-    QTableWidgetItem *item = ui->tableWidget_S->item(ui->tableWidget_S->currentRow(), 6); // Replace 6 with the actual column index of the phone number in your table
-
-    if (!item) {
-        QMessageBox::warning(nullptr, "Phone Number Error", "Please select a row in the table.");
-        return;
-    }
-
-    //QString phoneNumber = item->text();
-    QString phoneNumber ="+21656623537";
-
-    // Twilio API endpoint
-    QUrl apiUrl("https://api.twilio.com/2010-04-01/Accounts/" + accountSid + "/Messages.json");
-
-    // Create a request
-    QNetworkRequest request(apiUrl);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-    request.setRawHeader("Authorization", "Basic " + QByteArray((accountSid + ":" + authToken).toUtf8()).toBase64());
-
-    // Prepare POST data
-    QUrlQuery postData;
-    postData.addQueryItem("To", phoneNumber);
-    postData.addQueryItem("From", twilioPhoneNumber);
-    postData.addQueryItem("Body", "test13/03");
-
-    // Create a network manager and send the request
-    QNetworkAccessManager* manager = new QNetworkAccessManager(this);
-    QNetworkReply* reply = manager->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
-
-    // Handle the reply
-    QObject::connect(reply, &QNetworkReply::finished, [=]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            QMessageBox::information(nullptr, "SMS Sent", "SMS sent successfully.");
-        } else {
-            QMessageBox::critical(nullptr, "SMS Error", "Failed to send SMS. Error: " + reply->errorString());
-        }
-
-        // Clean up
-        reply->deleteLater();
-        manager->deleteLater();
-    });
-}
-
-void MainWindow::on_SMS_clicked() {
-    std::string accountSid = "ACa18405085019ebc311b26b8ade0edd23";
-    std::string authToken = "f4842fc74fb08e3c8918b82b67bbaffc";
-
-    // Initialize Twilio client
-    twilio::Rest::Response::setAuth(accountSid, authToken);
-
-    // Construct message options
-    twilio::PhoneNumber toNumber("+21656623537");
-    twilio::PhoneNumber fromNumber("+12185146708");
-    std::string body = "test 14/03 00:21";
-    twilio::MessageOptions messageOptions(toNumber, body);
-    messageOptions.setFrom(fromNumber);
-
-    // Send message
-    twilio::MessageResource message = twilio::MessageResource::create(messageOptions);
-
-    // Output response
-    std::cout << "Message sent. SID: " << message.sid() << std::endl;
-}
-
 void MainWindow::on_SMS_clicked()
 {
-    QMessageBox::warning(this,"Success", "sms tenzal");
-    // Twilio Account SID, Auth Token, and Twilio phone number
-    QString accountSid = "ACfbf00a28b60d1857ef04da7502bc1849";
-    QString authToken = "25ea7f30559ff9bd6b6c4fc4869aa4fb";
-    QString twilioPhoneNumber = "+12185146708";
+    Sponsor s;
+    QMessageBox::warning(this, "Success", "sms tenzal");
+    qInfo()<< QSslSocket::sslLibraryBuildVersionString();
+    QString message= ui->smsEdit->toPlainText();
 
-    // Get selected phone number from the QTableWidget
-    QTableWidgetItem *item = ui->tableWidget_S->item(ui->tableWidget_S->currentRow(), 6); // Replace 6 with the actual column index of the phone number in your table
+    QString phoneNumber = "+21656623537"; // Use the selected phone number from the table
 
-    if (!item) {
-        QMessageBox::warning(nullptr, "Phone Number Error", "Please select a row in the table.");
-        return;
+    // Call the function to send the SMS
+    s.sendSMS(phoneNumber,message);
+}
+
+void MainWindow::on_pushButton_annulerS2_clicked()
+{
+    ui->smsEdit->clear();
+}
+
+/*
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == ui->lineEdit_nomS && (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease))
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        QString text = ui->lineEdit_nomS->text();
+
+        // Your existing validation code goes here...
+
+        // Clear the error label if the text is valid
+        if (text.isEmpty() || (text.toDouble() != 0.0 && text.toDouble() != 0.0))
+        {
+            ui->champs_erreur_ajout_Transaction->clear(); // Clear the error label
+        }
     }
 
-    QString phoneNumber = "+21656623537";
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        // Clear the result label
+        ui->champ_resultat_CRUD_Transaction->clear();
 
-    // Twilio API endpoint
-    QUrl apiUrl("https://api.twilio.com/2010-04-01/Accounts/" + accountSid + "/Messages.json");
-
-    // Create a request
-    QNetworkRequest request(apiUrl);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-    request.setRawHeader("Authorization", "Basic " + QByteArray((accountSid + ":" + authToken).toUtf8()).toBase64());
-
-    // Prepare POST data
-    QUrlQuery postData;
-    postData.addQueryItem("To", phoneNumber);
-    postData.addQueryItem("From", twilioPhoneNumber);
-    postData.addQueryItem("Body", "message1");
-
-    // Create a network manager and send the request
-    QNetworkAccessManager* manager = new QNetworkAccessManager(this);
-    QNetworkReply* reply = manager->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
-
-    // Handle the reply
-    QObject::connect(reply, &QNetworkReply::finished, [=]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            QMessageBox::information(nullptr, "SMS Sent", "SMS sent successfully.");
-        } else {
-            QMessageBox::critical(nullptr, "SMS Error", "Failed to send SMS. Error: " + reply->errorString());
+        // Clear modification fields in the table
+        for (int r = 0; r < ui->table_de_transactions->rowCount(); ++r)
+        {
+            for (int c = 0; c < ui->table_de_transactions->columnCount(); ++c)
+            {
+                QWidget *cellWidget = ui->table_de_transactions->cellWidget(r, c);
+                if (cellWidget) {
+                    cellWidget->deleteLater();
+                }
+            }
         }
+    }
 
-        // Clean up
-        reply->deleteLater();
-        manager->deleteLater();
-    });
-}*/
-
-
-
+    return QObject::eventFilter(obj, event);
+}
+*/

@@ -8,6 +8,13 @@
 #include <QDate>
 #include <QMessageBox>
 
+#include <QUrl>
+#include <QUrlQuery>
+#include <QNetworkRequest>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QCoreApplication>
+
 Sponsor::Sponsor()
 {
     nom="";
@@ -220,3 +227,40 @@ bool Sponsor::trierParPack(QTableWidget *tableWidget)
     }
 }
 
+void Sponsor::sendSMS(const QString& phoneNumber, const QString& message ) {
+    // Twilio Account SID, Auth Token, and Twilio phone number
+    QString accountSid = "ACa18405085019ebc311b26b8ade0edd23";
+    QString authToken = "f4842fc74fb08e3c8918b82b67bbaffc";
+    QString twilioPhoneNumber = "+12185146708";
+
+    // Twilio API endpoint
+    QUrl apiUrl("https://api.twilio.com/2010-04-01/Accounts/ACa18405085019ebc311b26b8ade0edd23/Messages.json");
+
+    // Create a request
+    QNetworkRequest request(apiUrl);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    request.setRawHeader("Authorization", "Basic " + QByteArray((accountSid + ":" + authToken).toUtf8()).toBase64());
+
+    // Prepare POST data
+    QUrlQuery postData;
+    postData.addQueryItem("To", phoneNumber);
+    postData.addQueryItem("From", twilioPhoneNumber);
+    postData.addQueryItem("Body", message);
+
+    // Create a network manager and send the request
+    QNetworkAccessManager* manager = new QNetworkAccessManager();
+    QNetworkReply* reply = manager->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
+
+    // Handle the reply
+    QObject::connect(reply, &QNetworkReply::finished, [=]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QMessageBox::information(nullptr, "SMS Sent", "SMS sent successfully.");
+        } else {
+            QMessageBox::critical(nullptr, "SMS Error", "Failed to send SMS. Error: " + reply->errorString());
+        }
+
+        // Clean up
+        reply->deleteLater();
+        manager->deleteLater();
+    });
+}

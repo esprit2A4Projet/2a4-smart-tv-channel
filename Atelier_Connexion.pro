@@ -25,20 +25,26 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
+    main.cpp \
+    mainwindow.cpp \
     connection.cpp \
     sponsor.cpp
 
 HEADERS += \
-        mainwindow.h \
+    mainwindow.h \
     connection.h \
     sponsor.h
 
 FORMS += \
-        mainwindow.ui
+    mainwindow.ui
+
+# OpenSSL library path
+LIBS += -LC:/OpenSSL-Win32/lib
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    sms.qrc

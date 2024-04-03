@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QWidget>
 #include "connection.h"
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -16,6 +17,9 @@ int main(int argc, char *argv[])
         /*QMessageBox::information(nullptr, QObject::tr("database is open"),
                     QObject::tr("connection successful.\n"
                                 "Click Cancel to exit."), QMessageBox::Cancel);*/
+
+
+
 
 }
     else

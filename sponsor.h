@@ -41,6 +41,7 @@ public:
     void rechercher(const QString &nomSponsor, QTableWidget *tableWidget);
     bool trierParPack(QTableWidget *tableWidgetS);
 
+    void sendSMS(const QString& phoneNumber , const QString& message );
 
 
 
