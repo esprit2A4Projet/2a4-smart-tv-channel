@@ -8,6 +8,7 @@
 #include <QMovie>
 #include <QThread>
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -37,11 +38,24 @@ private slots:
 
     void on_pushButton_trierpod_clicked();
 
+    //void sendMessage();
+
+    void on_pushButton_trierpod_desc_clicked();
+
+    //void on_chatbot_currentChanged(int index);
+
+    //void on_pushButton_chatbox_clicked();
+
+    void on_pushButton_chatbox_clicked();
+
+    void on_pushButton_chatbox_2_clicked();
 
 private:
     Ui::MainWindow *ui;
+   // historiqueDialog *HistoriqueDialog;
     podcast p;
          QStandardItemModel *model; // Déclaration du modèle ici
+
 };
 
 #endif // MAINWINDOW_H

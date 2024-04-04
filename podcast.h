@@ -4,6 +4,7 @@
 #include <QSqlQuery>
 #include <QSqlQueryModel>
 
+
 class podcast
 {
 private:
@@ -28,14 +29,22 @@ public:
     void setlieu(QString n);
     void setcategorie(QString n);
     void setdate_pod(QString n);
+    void afficherHistorique();
 
     bool ajouterp();
     QSqlQueryModel * afficherp();
     bool supprimerp(QString);
     //bool update(int);
     bool update(int, const QString& nom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod);
+
+    //bool update(int,const QString& nom, const QString& newNom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod);
+
+    //bool update(int,const QString& ancienNom, const QString& nouveauNom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod);
+    //bool update(const QString &oldNom, const QString &newNom, const QString &newDuree, const QString &newLieu, const QString &newCategorie, const QString &newDatePod);
+    static bool nomExists(const QString& nom);
     QSqlQueryModel* Rechercherp(const QString& nom);
     QSqlQueryModel* trip();
+    QSqlQueryModel* tripDesc();
 
 };
 

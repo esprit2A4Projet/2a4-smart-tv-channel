@@ -5,6 +5,10 @@
 #include <QSqlQueryModel>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QFile>
+#include <QVBoxLayout>
+#include <QMessageBox>
+#include <QTextEdit>
 
 podcast::podcast()
 {
@@ -61,22 +65,29 @@ QSqlQueryModel* podcast::afficherp(){
    QSqlQueryModel* model=new QSqlQueryModel();
 
          model->setQuery("SELECT* FROM PODCASTS");
-         model->setHeaderData(0, Qt::Horizontal, QObject::tr("Identifiant"));
-         model->setHeaderData(1, Qt::Horizontal, QObject:: tr("Nom"));
-         model->setHeaderData(2, Qt::Horizontal, QObject:: tr("duree"));
-         model->setHeaderData(3, Qt::Horizontal, QObject:: tr("lieu"));
-         model->setHeaderData(4, Qt::Horizontal, QObject:: tr("categorie"));
-         model->setHeaderData(5, Qt::Horizontal, QObject:: tr("date_pod"));
+         model->setHeaderData(0,Qt::Horizontal,QObject::tr("id"));
+         model->setHeaderData(1,Qt::Horizontal,QObject::tr("Nom"));
+         model->setHeaderData(2,Qt::Horizontal,QObject::tr("Durée min"));
+         model->setHeaderData(3,Qt::Horizontal,QObject::tr("Lieu"));
+         model->setHeaderData(4,Qt::Horizontal,QObject::tr("Categorie"));
+         model->setHeaderData(5,Qt::Horizontal,QObject::tr("Date du Podcast"));
+
 
  return model;
 }
-
-bool podcast::nomExisteDeja(const QString &nom) const {
-    // Logique pour vérifier si le nom existe déjà dans la base de données
-    // Retourner true si le nom existe, sinon retourner false
+bool podcast::nomExists(const QString& nom) {
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM podcasts WHERE nom = :nom");
+    query.bindValue(":nom", nom);
+    if (query.exec() && query.next()) {
+        int count = query.value(0).toInt();
+        return count > 0;
+    }
+    return false;
 }
 
-bool podcast::supprimerp(QString)
+
+bool podcast::supprimerp(QString nom)
 {
     QSqlQuery query;
     query.prepare("DELETE FROM PODCASTS WHERE nom = ?");
@@ -96,7 +107,9 @@ bool podcast::supprimerp(int id)
 }
 */
 
-// Dans podcast.cpp
+
+
+
 bool podcast::update(int, const QString& newNom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod)
 {
     QSqlQuery query;
@@ -106,27 +119,7 @@ bool podcast::update(int, const QString& newNom, const QString& duree, const QSt
     query.bindValue(":lieu", lieu);
     query.bindValue(":categorie", categorie);
     query.bindValue(":date_pod", date_pod);
-    //query.bindValue(":nom", nom);
-
-    if (query.exec()) {
-        return true; // La modification a réussi
-    } else {
-        qDebug() << "Erreur de mise à jour du podcast:" << query.lastError().text();
-        return false; // La modification a échoué
-    }
-}
-/*
-
-bool podcast::update(int id, const QString& nom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod)
-{
-    QSqlQuery query;
-    query.prepare("UPDATE PODCASTS SET nom = :nom, duree = :duree, lieu = :lieu, categorie = :categorie, date_pod = :date_pod WHERE id_podcast = :id");
     query.bindValue(":nom", nom);
-    query.bindValue(":duree", duree);
-    query.bindValue(":lieu", lieu);
-    query.bindValue(":categorie", categorie);
-    query.bindValue(":date_pod", date_pod);
-    query.bindValue(":id", id);
 
     if (query.exec()) {
         return true; // La modification a réussi
@@ -135,7 +128,13 @@ bool podcast::update(int id, const QString& nom, const QString& duree, const QSt
         return false; // La modification a échoué
     }
 }
-*/
+
+
+
+
+
+
+
 QSqlQueryModel* podcast::Rechercherp(const QString& nom)
 {
     QSqlQueryModel *model = new QSqlQueryModel;
@@ -169,14 +168,57 @@ QSqlQueryModel* podcast::trip()
    model->setQuery("SELECT * FROM PODCASTS ORDER BY date_pod ASC ");
 
    model->setHeaderData(0,Qt::Horizontal,QObject::tr("id"));
-   model->setHeaderData(1,Qt::Horizontal,QObject::tr("nom"));
-   model->setHeaderData(2,Qt::Horizontal,QObject::tr("duree"));
-   model->setHeaderData(3,Qt::Horizontal,QObject::tr("lieu"));
-   model->setHeaderData(4,Qt::Horizontal,QObject::tr("categorie"));
-   model->setHeaderData(5,Qt::Horizontal,QObject::tr("date_pod"));
+   model->setHeaderData(1,Qt::Horizontal,QObject::tr("Nom"));
+   model->setHeaderData(2,Qt::Horizontal,QObject::tr("Durée min"));
+   model->setHeaderData(3,Qt::Horizontal,QObject::tr("Lieu"));
+   model->setHeaderData(4,Qt::Horizontal,QObject::tr("Categorie"));
+   model->setHeaderData(5,Qt::Horizontal,QObject::tr("Date du Podcast"));
 
 
    return  model;
 
 }
 
+QSqlQueryModel* podcast::tripDesc()
+{
+   QSqlQueryModel * model=new QSqlQueryModel();
+   model->setQuery("SELECT * FROM PODCASTS ORDER BY date_pod DESC ");
+
+   model->setHeaderData(0,Qt::Horizontal,QObject::tr("id"));
+   model->setHeaderData(1,Qt::Horizontal,QObject::tr("Nom"));
+   model->setHeaderData(2,Qt::Horizontal,QObject::tr("Durée min"));
+   model->setHeaderData(3,Qt::Horizontal,QObject::tr("Lieu"));
+   model->setHeaderData(4,Qt::Horizontal,QObject::tr("Categorie"));
+   model->setHeaderData(5,Qt::Horizontal,QObject::tr("Date du Podcast"));
+
+
+
+   return  model;
+
+}
+
+
+void podcast::afficherHistorique() {
+    QFile historyFile("C:/Users/ISMAIL/Desktop/crud/Historique.txt");
+    if (historyFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&historyFile);
+        QString historiqueContenu = in.readAll();
+        historyFile.close();
+
+        // Displaying the history in a dialog
+        QDialog* historiqueDialog = new QDialog(nullptr);
+        historiqueDialog->setWindowTitle("Historique");
+        historiqueDialog->setMinimumSize(400, 300);
+
+        QTextEdit* textEdit = new QTextEdit(historiqueDialog);
+        textEdit->setPlainText(historiqueContenu);
+        textEdit->setReadOnly(true);
+
+        QVBoxLayout* layout = new QVBoxLayout(historiqueDialog);
+        layout->addWidget(textEdit);
+
+        historiqueDialog->exec();
+    } else {
+        QMessageBox::warning(nullptr, "Erreur", "Impossible d'ouvrir le fichier d'historique pour la lecture.");
+    }
+}

@@ -1,0 +1,136 @@
+/*
+
+QString filePath = QFileDialog::getSaveFileName(this, "Export to Excel", QString(), "CSV Files (*.csv)");
+
+if (filePath.isEmpty())
+    return;
+
+QFile file(filePath);
+if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    qDebug() << "Failed to open file for writing.";
+    return;
+}
+
+QTextStream out(&file);
+
+// Write header
+QStringList headerData = {"Nom", "Duree", "Lieu", "Categorie", "Date_Pod"};
+out << headerData.join(",") << "\n";
+
+// Retrieve data from the database
+QSqlQuery query;
+if (!query.exec("SELECT nom, duree, lieu, categorie, date_pod FROM tableViewp")) {
+    qDebug() << "Error executing SQL query:" << query.lastError().text();
+    return;
+}
+
+// Write data to file
+while (query.next()) {
+    for (int col = 0; col < query.record().count(); ++col) {
+        out << query.value(col).toString();
+        if (col < query.record().count() - 1)
+            out << ",";
+    }
+    out << "\n";
+}
+
+file.close();
+
+qDebug() << "Database exported to Excel successfully.";
+
+*/
+
+
+/*
+* QString filePath = QFileDialog::getSaveFileName(this, "Export to Text File", QString(), "Text Files (*.txt)");
+
+    if (filePath.isEmpty())
+        return;
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "Failed to open file for writing.";
+        return;
+    }
+
+    QTextStream out(&file);
+
+    // Retrieve data from the database
+    QSqlQuery query;
+    if (!query.exec("SELECT nom, duree, lieu, categorie, date_pod FROM tableViewp")) {
+        qDebug() << "Error executing SQL query:" << query.lastError().text();
+        return;
+    }
+
+    // Write data to file
+    while (query.next()) {
+        for (int col = 0; col < query.record().count(); ++col) {
+            out << query.value(col).toString();
+            if (col < query.record().count() - 1)
+                out << "\t"; // Use tab as a delimiter for text file
+        }
+        out << "\n";
+    }
+
+    file.close();
+
+    qDebug() << "Database exported to text file successfully.";
+
+    */
+
+/*
+
+QString filePath = QFileDialog::getSaveFileName(this, "Export to Excel", QString(), "Excel Files (*.xlsx)");
+
+if (filePath.isEmpty())
+    return;
+
+QAxObject *excel = new QAxObject("Excel.Application", this);
+
+if (excel->isNull()) {
+    // Handle the case when Excel is not available
+    delete excel;
+    return;
+}
+
+QAxObject *workbooks = excel->querySubObject("Workbooks");
+QAxObject *workbook = workbooks->querySubObject("Add()");
+QAxObject *worksheets = workbook->querySubObject("Worksheets(int)", 1);
+QAxObject *worksheet = worksheets->querySubObject("Cells(int, int)", 1, 1);
+
+QStringList headerData = {"Nom", "Duree", "Lieu", "Categorie", "Date"}; // New header names
+
+// Write headers
+int col = 1;
+foreach (const QString &header, headerData)
+{
+    worksheet->querySubObject("Cells(int, int)", 1, col++)->setProperty("Value", header);
+}
+
+// Write data
+int row = 2; // Start from the second row
+
+QString nom = ui->lineEdit_nomp->text();
+QString duree = ui->lineEdit_dureep->text();
+QString lieu = ui->lineEdit_lieup->text();
+QString categorie = ui->lineEdit_categoriep->text();
+QString date_pod = ui->dateEditp->text();
+
+worksheet->querySubObject("Cells(int, int)", row, 1)->setProperty("Value", nom);
+worksheet->querySubObject("Cells(int, int)", row, 2)->setProperty("Value", duree);
+worksheet->querySubObject("Cells(int, int)", row, 3)->setProperty("Value", lieu);
+worksheet->querySubObject("Cells(int, int)", row, 4)->setProperty("Value", categorie);
+worksheet->querySubObject("Cells(int, int)", row, 5)->setProperty("Value", date_pod);
+
+workbook->dynamicCall("SaveAs(const QString&)", filePath);
+workbook->dynamicCall("Close()");
+excel->dynamicCall("Quit()");
+
+// Introduce a delay before deleting or moving the file
+//QThread::msleep(1000); // 1000 milliseconds (1 second) delay
+
+delete excel;
+
+qDebug() << "Debug Information";
+*/
+
