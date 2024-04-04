@@ -31,7 +31,7 @@ public:
 
     bool ajouterp();
     QSqlQueryModel * afficherp();
-    bool supprimerp(int);
+    bool supprimerp(QString);
     //bool update(int);
     bool update(int, const QString& nom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod);
     QSqlQueryModel* Rechercherp(const QString& nom);

@@ -2,13 +2,14 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include "employee.h"
+#include "login.h"
 #include "invite.h"
 #include "sponsor.h"
 #include "materiaux.h"
 #include "connection.h"
 #include <QInputDialog>
 #include <QTextStream>
-
+#include "qrcodegen.hpp"
 #include <QDesktopServices>
 #include <QPdfWriter>
 #include <QPainter>
@@ -16,7 +17,7 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QTextDocument>
-
+#include<QUrl>
 #include <QString>
 #include <QDebug>
 #include <QSqlQuery>
@@ -24,25 +25,57 @@
 
 #include <QKeyEvent>
 #include <QVBoxLayout>
+#include <QtCharts/QChartView>
+#include <QtCharts/QChart>
 
+#include <fstream>
+#include <QtCharts>
+#include <QChartView>
+
+
+#include <QFont>
+#include "qrcode.hpp"
+
+
+using namespace qrcodegen;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     Employee E;
+
        ui->setupUi(this);
+   // Feriel
+       // Connect the button click signal to the displaySalaryChart slot
+         connect(ui->pushButtonDisplaySalaryChart, &QPushButton::clicked,this, &MainWindow::displaySalaryChart);
+       //  connect(ui->pushButtonShowStatistics, &QPushButton::clicked, this, &MainWindow::showStatistics);
+         connect(ui->pushButtonClearStatistics, &QPushButton::clicked, this, &MainWindow::clearStatistics);
+
+
+   /*    if (ui->tableView->currentIndex().row() == 7) {
+                   for (int i = 0; i < 7; i++) {
+                       ui->tabWidget->setTabEnabled(i, false);
+                   }
+               }*/
+       // *************************************///////
        ui->lineEdit_nom->setValidator(new QRegExpValidator(QRegExp("[A-Za-z ]+"), this));
        ui->lineEdit_prenom->setValidator(new QRegExpValidator(QRegExp("[A-Za-z ]+"), this));
        ui->lineEdit_salaire->setValidator(new QRegExpValidator(QRegExp("[0-9]*\\.?([0-9]+)?"), this));
-       ui->lineEdit_cin->setValidator(new QIntValidator(0, 99999999, this));
-       ui->lineEdit_3->setValidator(new QIntValidator(0, 99999999, this));
-       ui->lineEdit_8->setValidator(new QIntValidator(0, 99999999, this));
+       ui->lineEdit_cin->setValidator(new QIntValidator(0, 999999, this));
+       ui->lineEdit_id_login->setValidator(new QIntValidator(0, 999999, this));
+       ui->lineEdit_codeQR->setValidator(new QIntValidator(0, 999999, this));
+     //   connect(ui->lineEdit_cin, &QLineEdit::editingFinished, this, &MainWindow::validateCIN);
+       connect(ui->lineEdit_cin, &QLineEdit::textChanged, this, &MainWindow::updateMessageLabel);
+       //connect(ui->lineEdit_cin, &QLineEdit::editingFinished, this, &MainWindow::validateAndAddCIN);
+
+       ui->lineEdit_3->setValidator(new QIntValidator(0,  999999, this));
+       ui->lineEdit_8->setValidator(new QIntValidator(0,  999999, this));
 
        ui->comboBox->addItem("Ressources Humaines");
        ui->comboBox->addItem("R. podcast");
        ui->comboBox->addItem("R. sponsoring");
        ui->comboBox->addItem("tresorier");
-       ui->comboBox->addItem("C.Invités ");
+       ui->comboBox->addItem("C.Invites");
        ui->comboBox->addItem("R.logistique ");
        ui->comboBox->addItem("Autre");
        // Connectez le signal textChanged à une fonction de vérification personnalisée
@@ -56,18 +89,67 @@ MainWindow::MainWindow(QWidget *parent)
        model->setHorizontalHeaderLabels({ "Nom", "Prénom","email", "Date Embauche", "Salaire", "Poste","cin"});
        ui->tableView->setModel(model);
 
-// LOGIN :
-
-     //ui->tableView->setModel(e.afficher());
-       ui->label_gif_animation->setVisible(true);
+       // NEW LOGIN :
+       //ui->label_gif_animation->setVisible(true);
+       ui->label_gif_animation_2->setVisible(true);
        // Spécifiez le chemin absolu complet du fichier GIF
-       QString gifPath = "C:/Users/MSI/OneDrive - ESPRIT/Bureau/conneter.gif";
+       QString gifPath = "C:/Users/MSI/OneDrive - ESPRIT/Bureau/loginvf/animation logo version finale.gif";
+
        // Créez le QMovie en utilisant le chemin absolu complet
        QMovie *gifanimation = new QMovie(gifPath);
+
+       // Définissez le QMovie sur le QLabel
+
+       ui->label_gif_animation_2->setMovie(gifanimation);
+
+       // Démarrez l'animation
+       gifanimation->start();
+
+     /* if (ui->tabWidget->currentIndex() == 7) {
+           ui->tabWidget->setTabEnabled(2, false);
+           ui->tabWidget->setTabEnabled(0, false);
+           ui->tabWidget->setTabEnabled(1, false);
+           ui->tabWidget->setTabEnabled(3, false);
+           ui->tabWidget->setTabEnabled(4, false);
+           ui->tabWidget->setTabEnabled(5, false);  // <-- This line seems redundant, as it disables the same tab that was just enabled
+           ui->tabWidget->setTabEnabled(6, false);
+       }
+*/
+       ui->tabWidget->setCurrentIndex(7);
+
+
+      int expectedIndex = 7;  // Define the expected index value
+
+       if (ui->tabWidget->currentIndex() == expectedIndex) {
+           // Disable specific tabs when the current index matches the expected index
+           ui->tabWidget->setTabEnabled(0, false);
+           ui->tabWidget->setTabEnabled(1, false);
+           ui->tabWidget->setTabEnabled(2, false);
+           ui->tabWidget->setTabEnabled(3, false);
+           ui->tabWidget->setTabEnabled(4, false);
+           ui->tabWidget->setTabEnabled(5, false);  // This line is redundant if index 5 is already disabled
+           ui->tabWidget->setTabEnabled(6, false);
+            ui->tabWidget->setTabEnabled(7, true);
+       } else {
+           // Optionally, you can handle other cases or provide debugging information here
+           qDebug() << "Current index is not " << expectedIndex;
+       }
+
+       // Get the current index of the tab widget
+
+
+// LOGIN :
+
+    /* //ui->tableView->setModel(e.afficher());
+       ui->label_gif_animation->setVisible(true);
+       // Spécifiez le chemin absolu complet du fichier GIF
+     //  QString gifPath = "C:/Users/MSI/OneDrive - ESPRIT/Bureau/conneter.gif";
+       // Créez le QMovie en utilisant le chemin absolu complet
+     //  QMovie *gifanimation = new QMovie(gifPath);
        // Définissez le QMovie sur le QLabel
        ui->label_gif_animation->setMovie(gifanimation);
        // Démarrez l'animation
-       gifanimation->start();
+       gifanimation->start();*/
 
 
  // Ibtissem :
@@ -155,10 +237,10 @@ MainWindow::MainWindow(QWidget *parent)
        QStringList labelsT{"Mode de paiement", "Type", "Categorie", "Date de transaction", "Montant en dinar","ID"};
        ui->table_de_transactions->setHorizontalHeaderLabels(labelsT);
 //---------------------------------------------------------------------------------------------------------------------//
-// Ismail :
+  // Ismail :
        ui->lineEdit_nomp->setValidator(new QRegExpValidator(QRegExp("[A-Za-z ]+"), this));
        //ui->lineEdit_categoriep->setValidator(new QRegExpValidator(QRegExp("[A-Za-z ]+"), this));
-       ui->lineEdit_dureep->setValidator(new QRegExpValidator(QRegExp("[0-9]*\\.?([0-9]+)?"), this));
+       ui->lineEdit_dureep->setValidator(new QIntValidator(0, 999, this));
        //ui->lineEdit_7p->setValidator(new QIntValidator(0, 99999999, this));
        //ui->lineEdit_8p->setValidator(new QIntValidator(0, 99999999, this));
 
@@ -186,6 +268,86 @@ MainWindow::~MainWindow()
 }
 
 // Feriel :
+void MainWindow::updateMessageLabel(const QString &text) {
+    if (text.length() == 6) {
+        ui->label_message->setText("");
+    } else {
+        ui->label_message->setText("Veuillez saisir exactement 6 chiffres.");
+    }
+}
+
+/*
+void MainWindow::validateAndAddCIN() {
+    qDebug() << "validateAndAddCIN called";
+
+    QString cinText = ui->lineEdit_cin->text();
+
+    // Vérifiez que la saisie contient exactement 8 chiffres
+    if (cinText.length() == 8) {
+        qDebug() << "Length check passed";
+
+        // Vérifiez l'unicité du numéro de CIN
+        if (!cinList.contains(cinText.toInt())) {
+            qDebug() << "Unique CIN check passed";
+
+            // Ajoutez le numéro de CIN à votre liste de numéros de CIN si c'est unique
+            cinList.append(cinText.toInt());
+            // Mettez à jour votre système avec le nouveau numéro de CIN ici
+
+            // Affichez un message de succès ou effectuez toute autre action nécessaire
+            ui->label_message->setText("CIN ajouté avec succès.");
+        } else {
+            // Affichez un message d'erreur si le numéro de CIN est déjà présent dans la liste
+            ui->label_message->setText("Ce CIN existe déjà.");
+            // Réinitialisez la valeur de la QLineEdit si vous le souhaitez
+            // ui->lineEdit_cin->clear();
+        }
+    } else {
+        // Affichez un message d'erreur si la longueur de la saisie est incorrecte
+        ui->label_message->setText("Veuillez saisir exactement 8 chiffres.");
+        // Réinitialisez la valeur de la QLineEdit si vous le souhaitez
+        // ui->lineEdit_cin->clear();
+    }
+}
+*/
+
+/*void MainWindow::validateCIN() {
+    QString cinText = ui->lineEdit_cin->text();
+
+    // Vérifiez que la longueur de la saisie est de 8 caractères
+    if (cinText.length() == 8) {
+        // La saisie est valide, rien à faire
+    } else {
+        // Affichez un message d'erreur à l'utilisateur
+        QMessageBox::warning(this, "Erreur", "Le numéro de CIN doit contenir exactement 8 chiffres.");
+        // Réinitialisez la valeur de la QLineEdit si vous le souhaitez
+        // ui->lineEdit_cin->clear();
+    }
+}*/
+void MainWindow::clearStatistics() {
+    // Parcourir tous les widgets dans la mise en page et supprimer le widget du graphique s'il est présent
+    QLayoutItem *child;
+    while ((child = ui->horizontalFrame->layout()->takeAt(0)) != nullptr) {
+        if (child->widget()) {
+            delete child->widget();
+        }
+        delete child;
+    }
+}
+void MainWindow::displaySalaryChart() {
+    Employee activiterObject; // Create an instance of your activiter class
+
+    // Call the stat_salaire function to get the salary statistics chart
+    QChartView *chartView = activiterObject.stat();
+
+    if (chartView) { // Check if the chartView is not null
+        // Add the chartView to your horizontalFrame layout
+        ui->horizontalFrame->layout()->addWidget(chartView);
+    } else {
+        qDebug() << "Error: Couldn't create the salary statistics chart";
+    }
+}
+
 // Définition de la fonction de vérification personnalisée
 void MainWindow::checkEmailFormat(const QString &text)
 {
@@ -199,11 +361,124 @@ void MainWindow::checkEmailFormat(const QString &text)
     }
 }
 
-
-
-
+/*
 void MainWindow::on_pushButton_23_clicked() // Bouton Valider
 {
+    QString nom = ui->lineEdit_nom->text();
+    QString prenom = ui->lineEdit_prenom->text();
+    QString date = ui->dateEdit->text();
+    QString email = ui->lineEdit_email->text();
+    int cin = ui->lineEdit_cin->text().toInt();
+    int salaire = ui->lineEdit_salaire->text().toInt();
+    QString poste = ui->comboBox->currentText();
+
+    Employee employee;
+    bool cinUnique = employee.isCinUnique(cin);
+
+    // Vérification de l'unicité du CIN
+    if (cinUnique) {
+        // Continuer avec l'ajout de l'employé
+        int id = ui->lineEdit_3->text().toInt(); // Assuming this is the employee ID
+        Employee e(nom, prenom, email, date, salaire, poste, cin);
+        bool success = false;
+
+        if (id == 0) {
+            // Si l'ID est 0, cela signifie que nous ajoutons un nouvel employé
+            success = e.ajouter(poste);
+        } else {
+            // Sinon, nous mettons à jour un employé existant
+            success = e.update(id);
+            ui->lineEdit_3->clear();
+            QMessageBox::information(nullptr, QObject::tr("OK"),
+                                     QObject::tr("Modification effectuée\n"
+                                                 "Click Cancel to exit."), QMessageBox::Cancel);
+        }
+
+        QMessageBox msgBox;
+        if (success) {
+            ui->tableView->setModel(e.afficher());
+            ui->lineEdit_nom->clear();
+            ui->lineEdit_prenom->clear();
+            ui->lineEdit_email->clear();
+            ui->dateEdit->clear();
+            ui->lineEdit_salaire->clear();
+            ui->lineEdit_cin->clear();
+        } else {
+            msgBox.setText("Operation failed.");
+            msgBox.exec();
+        }
+    } else {
+        QMessageBox::warning(this, "Erreur", "Le numéro de CIN existe déjà dans la base de données.");
+    }
+}
+
+*/
+void MainWindow::on_pushButton_23_clicked() // Bouton Valider
+{
+    QString nom = ui->lineEdit_nom->text();
+    QString prenom = ui->lineEdit_prenom->text();
+    QString date = ui->dateEdit->text();
+    QString email = ui->lineEdit_email->text();
+    int cin = ui->lineEdit_cin->text().toInt();
+    int salaire = ui->lineEdit_salaire->text().toInt();
+    QString poste = ui->comboBox->currentText();
+
+    int id = ui->lineEdit_3->text().toInt(); // Assuming this is the employee ID
+    Employee e(nom, prenom, email, date, salaire, poste, cin);
+    bool success = false;
+
+    //if (Employee::isCinUnique(cin)) // Custom static method to check uniqueness of cin
+   // {
+        if (id == 0 && Employee::isCinUnique(cin) )
+        {
+            // If the ID is 0, it means we are creating a new employee
+            success = e.ajouter(poste);
+        }
+        else if (id == 0 && !(Employee::isCinUnique(cin) ))
+        {
+             QMessageBox::critical(this, "Erreur", "CIN existe déjà. Veuillez saisir un CIN unique");
+        }
+        else
+        {
+            // Otherwise, we are updating an existing employee
+            success = e.update(id);
+            ui->lineEdit_3->clear();
+            QMessageBox::information(nullptr, QObject::tr("OK"),
+                                     QObject::tr("Modification effectué\n"
+                                                 "Click Cancel to exit."), QMessageBox::Cancel);
+        }
+
+        QMessageBox msgBox;
+        if (success)
+        {
+
+            ui->tableView->setModel(e.afficher());
+            ui->lineEdit_nom->clear();
+            ui->lineEdit_prenom->clear();
+            ui->lineEdit_email->clear();
+            ui->dateEdit->clear();
+            ui->lineEdit_salaire->clear();
+            ui->lineEdit_cin->clear();
+            ui->label_message->clear();
+        }
+        else
+        {
+            msgBox.setText("Operation failed.");
+            msgBox.exec();
+        }
+  /*  }
+    else
+    {
+        QMessageBox::critical(this, "Erreur", "CIN existe déjà. Veuillez saisir un CIN unique");
+    }*/
+}
+
+
+// ancienne :
+/*
+void MainWindow::on_pushButton_23_clicked() // Bouton Valider
+{
+
     QString nom = ui->lineEdit_nom->text();
     QString prenom = ui->lineEdit_prenom->text();
     QString date = ui->dateEdit->text();
@@ -219,7 +494,7 @@ void MainWindow::on_pushButton_23_clicked() // Bouton Valider
     if (id == 0)
     {
          // If the ID is 0, it means we are creating a new employee
-         success = e.ajouter();
+         success = e.ajouter(poste);
     } else
     {
          // Otherwise, we are updating an existing employee
@@ -240,13 +515,66 @@ void MainWindow::on_pushButton_23_clicked() // Bouton Valider
         ui->dateEdit->clear();
         ui->lineEdit_salaire->clear();
         ui->lineEdit_cin->clear();
+        ui->label_message->clear();
     } else {
         msgBox.setText("Operation failed.");
           msgBox.exec();
     }
 
-}
+}*/
+/*
+void MainWindow::on_pushButton_23_clicked() // Bouton Valider
+{
+    QString nom = ui->lineEdit_nom->text();
+    QString prenom = ui->lineEdit_prenom->text();
+    QString date = ui->dateEdit->text();
+    QString email = ui->lineEdit_email->text();
+    int cin = ui->lineEdit_cin->text().toInt();
+    int salaire = ui->lineEdit_salaire->text().toInt();
+    QString poste = ui->comboBox->currentText();
 
+    // Création d'une instance de la classe Employee
+    Employee employee;
+
+    // Vérification de l'unicité du CIN en appelant la méthode isCinUnique de l'instance employee
+    if (employee.isCinUnique(cin)) {
+        // Le CIN est unique, procéder à l'ajout ou à la mise à jour de l'employé
+        int id = ui->lineEdit_3->text().toInt(); // Assuming this is the employee ID
+        Employee e(nom, prenom, email, date, salaire, poste, cin);
+        bool success = false;
+
+        if (id == 0) {
+            // Si l'ID est 0, cela signifie que nous ajoutons un nouvel employé
+            success = e.ajouter(poste);
+        } else {
+            // Sinon, nous mettons à jour un employé existant
+            success = e.update(id);
+            ui->lineEdit_3->clear();
+            QMessageBox::information(nullptr, QObject::tr("OK"),
+                                     QObject::tr("Modification effectuée\n"
+                                                 "Click Cancel to exit."), QMessageBox::Cancel);
+        }
+
+        QMessageBox msgBox;
+        if (success) {
+            ui->tableView->setModel(e.afficher());
+            ui->lineEdit_nom->clear();
+            ui->lineEdit_prenom->clear();
+            ui->lineEdit_email->clear();
+            ui->dateEdit->clear();
+            ui->lineEdit_salaire->clear();
+            ui->lineEdit_cin->clear();
+            ui->label_message->clear();
+        } else {
+            msgBox.setText("Operation failed.");
+            msgBox.exec();
+        }
+    } else {
+        // Le CIN n'est pas unique, afficher un message d'erreur
+        QMessageBox::warning(this, "Erreur", "Le numéro de CIN existe déjà dans la base de données.");
+    }
+}
+*/
 
 void MainWindow::on_pushButton_22_clicked() // Button annuler
 {
@@ -2261,7 +2589,52 @@ void MainWindow::on_pushButton_annulerpod_clicked()
     //ui->lineEdit_categoriep->clear();
     ui->dateEditp->clear();
 }
+void MainWindow::on_pushButton_supprimerpod_clicked()
+{
 
+    QString nom = ui->lineEdit_7p->text();
+    // Obtenez le nom entré
+
+    podcast p;
+    QSqlQuery query;
+    //query.prepare("SELECT id_podcast, nom, duree, lieu, categorie, date_pod FROM PODCASTS WHERE nom = ?");
+    query.prepare("SELECT nom FROM PODCASTS WHERE nom = ?");
+    query.addBindValue(nom);
+
+    if (query.exec() && query.next()) {
+        // Récupérez les valeurs de la requête
+        //int id = query.value(0).toInt(); // Récupérez l'ID du podcast pour la suppression
+        QString nom = query.value(0).toString();
+        QString duree = query.value(1).toString();
+        QString lieu = query.value(2).toString();
+        QString categorie = query.value(2).toString();
+        QString date_pod = query.value(4).toString();
+
+
+        // Utilisez les valeurs récupérées pour instancier un objet podcast
+        p = podcast(nom, duree, lieu, categorie, date_pod);
+
+        // Supprimer le podcast
+        if (p.supprimerp(nom)) {
+            ui->tableViewp->setModel(p.afficherp());
+            QMessageBox::information(nullptr, QObject::tr("OK"),
+                QObject::tr("Suppression effectuée\n"
+                "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
+        } else {
+            // Afficher un message indiquant que le podcast est introuvable
+            QMessageBox::critical(nullptr, QObject::tr("Erreur"),
+                QObject::tr("Podcast inexistant.\n"
+                "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
+        }
+    } else {
+        // Afficher un message indiquant que le podcast est introuvable
+        QMessageBox::critical(nullptr, QObject::tr("Erreur"),
+            QObject::tr("Podcast inexistant.\n"
+            "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
+    }
+}
+
+/*
 void MainWindow::on_pushButton_supprimerpod_clicked()
 {
     int id = ui->lineEdit_7p->text().toInt();
@@ -2300,7 +2673,7 @@ void MainWindow::on_pushButton_supprimerpod_clicked()
                                                                             QObject::tr("Podcast inexistant.\n"
                                                                                         "Click sur Cancel pour quitter."), QMessageBox::Cancel);
                                         }
-                                        }
+                                        }*/
   /*  QString nom = ui->lineEdit_7p->text();
     // Obtenez le nom entré
 
@@ -2348,12 +2721,12 @@ void MainWindow::on_pushButton_modifierpod_clicked()
 {
 
 
-    int id = ui->lineEdit_7p->text().toInt();
+    QString nom = ui->lineEdit_7p->text();
     // Obtenez l'ID entré
     podcast p;
     QSqlQuery query;
-    query.prepare("SELECT id_podcast, nom, duree, lieu, categorie, date_pod FROM PODCASTS WHERE id_podcast = ?");
-    query.addBindValue(id);
+    query.prepare("SELECT id_podcast, nom, duree, lieu, categorie, date_pod FROM PODCASTS WHERE nom = ?");
+    query.addBindValue(nom);
 
     if (query.exec() && query.next()) {
         // Récupérez les valeurs de la requête
@@ -2380,7 +2753,7 @@ void MainWindow::on_pushButton_modifierpod_clicked()
                      QString newCategorie = ui->comboBoxp->setCurrentText(categorie);
                      QString newDatePod = ui->dateEditp->text();*/
 
-                     if (p.update(id, nom, duree, lieu, categorie, date_pod)) {
+                     if (p.update(0, nom, duree, lieu, categorie, date_pod)) {
                          ui->tableView->setModel(p.afficherp());
                          QMessageBox::information(nullptr, QObject::tr("OK"),
                                                   QObject::tr("Modification effectuée.\n"
@@ -2614,5 +2987,507 @@ void MainWindow::on_pushButton_trierpod_clicked() //tri
       }
 }
 
+void MainWindow::on_pushButton_3_clicked() {
+    int enteredUsername = ui->lineEdit_id_login->text().toInt();
+    QString enteredPassword = ui->lineEdit_mdp_login->text();
+
+    Login loginObject;
+    int userId = loginObject.validateLogin(enteredUsername, enteredPassword);
+
+    if (userId != -1) {
+        // Connexion réussie, redirigez l'utilisateur vers la page appropriée
+        switch (userId) {
+            case 1: // Employé RH
+                ui->tabWidget->setCurrentIndex(1);
+                ui->tabWidget->setTabEnabled(1, true);
+                userId=-1;
+                break;
+            case 2:
+                ui->tabWidget->setCurrentIndex(2);
+                ui->tabWidget->setTabEnabled(2, true);
+                break;
+            case 3:
+                ui->tabWidget->setCurrentIndex(3);
+                ui->tabWidget->setTabEnabled(3, true);
+                break;
+            case 4:
+                ui->tabWidget->setCurrentIndex(4);
+                ui->tabWidget->setTabEnabled(4, true);
+                break;
+            case 5:
+                ui->tabWidget->setCurrentIndex(5);
+                ui->tabWidget->setTabEnabled(5, true);
+                break;
+            case 6:
+                ui->tabWidget->setCurrentIndex(6);
+                ui->tabWidget->setTabEnabled(6, true);
+                break;
+            case 0:
+                ui->tabWidget->setCurrentIndex(0);
+                ui->tabWidget->setTabEnabled(0, true);
+                break;
+            default:
+                break;
+        }
+        // Désactivez les onglets inutiles
+        for (int i = 0; i < 7; i++) {
+            if ( ui->tabWidget->currentIndex()==7)
+            {
+                  ui->tabWidget->setTabEnabled(i, false);
+
+            }
+            if (i != ui->tabWidget->currentIndex()) {
+                ui->tabWidget->setTabEnabled(i, false);
+            }
+        }
+
+      /*  ui->tabWidget->setTabEnabled(0, false);
+        ui->tabWidget->setTabEnabled(1, false);
+        ui->tabWidget->setTabEnabled(3, false);
+        ui->tabWidget->setTabEnabled(3, false);
+        ui->tabWidget->setTabEnabled(4, false);
+        ui->tabWidget->setTabEnabled(5, false);  // This line is redundant if index 5 is already disabled
+        ui->tabWidget->setTabEnabled(6, false);
+        ui->tabWidget->setTabEnabled(7, true);*/
+
+    } else {
+        // Connexion échouée, affichez un message d'erreur
+        QMessageBox::warning(this, "Erreur de connexion", "Identifiants incorrects !");
+    }
+
+   /*if ( ui->tabWidget->currentIndex()==7)
+    {
 
 
+        ui->tabWidget->setTabEnabled(0, false);
+        ui->tabWidget->setTabEnabled(1, false);
+        ui->tabWidget->setTabEnabled(3, false);
+        ui->tabWidget->setTabEnabled(3, false);
+        ui->tabWidget->setTabEnabled(4, false);
+        ui->tabWidget->setTabEnabled(5, false);  // This line is redundant if index 5 is already disabled
+        ui->tabWidget->setTabEnabled(6, false);
+        ui->tabWidget->setTabEnabled(7, true);
+    }*/
+ //userId=-1;
+    // Effacez les champs de connexion après traitement
+    ui->lineEdit_id_login->clear();
+    ui->lineEdit_mdp_login->clear();
+}
+
+/*
+
+void MainWindow::on_pushButton_3_clicked() // Bouton Login
+{
+ int enteredUsername=ui->lineEdit_id_login->text().toInt();
+        QString enteredPassword =ui->lineEdit_mdp_login->text();
+
+        Login loginObject;
+        if (loginObject.validateLogin(enteredUsername, enteredPassword)==1) {
+            ui->tabWidget->setCurrentIndex(1);
+            ui->tabWidget->setTabEnabled(1, true);
+            ui->tabWidget->setTabEnabled(0, false);
+            ui->tabWidget->setTabEnabled(2, false);
+            ui->tabWidget->setTabEnabled(3, false);
+            ui->tabWidget->setTabEnabled(4, false);
+            ui->tabWidget->setTabEnabled(5, false);
+            ui->tabWidget->setTabEnabled(6, false);
+        }
+       else  if (loginObject.validateLogin(enteredUsername, enteredPassword)==2) {
+            ui->tabWidget->setCurrentIndex(2);
+            ui->tabWidget->setTabEnabled(2, true);
+            ui->tabWidget->setTabEnabled(0, false);
+            ui->tabWidget->setTabEnabled(1, false);
+            ui->tabWidget->setTabEnabled(3, false);
+            ui->tabWidget->setTabEnabled(4, false);
+            ui->tabWidget->setTabEnabled(5, false);
+            ui->tabWidget->setTabEnabled(6, false);
+        }
+        else  if (loginObject.validateLogin(enteredUsername, enteredPassword)==3) {
+             ui->tabWidget->setCurrentIndex(3);
+             ui->tabWidget->setTabEnabled(3, true);
+             ui->tabWidget->setTabEnabled(0, false);
+             ui->tabWidget->setTabEnabled(1, false);
+             ui->tabWidget->setTabEnabled(2, false);
+             ui->tabWidget->setTabEnabled(4, false);
+             ui->tabWidget->setTabEnabled(5, false);
+             ui->tabWidget->setTabEnabled(6, false);
+         }
+        else  if (loginObject.validateLogin(enteredUsername, enteredPassword)==4) {
+             ui->tabWidget->setCurrentIndex(4);
+             ui->tabWidget->setTabEnabled(4, true);
+             ui->tabWidget->setTabEnabled(0, false);
+             ui->tabWidget->setTabEnabled(1, false);
+             ui->tabWidget->setTabEnabled(2, false);
+             ui->tabWidget->setTabEnabled(3, false);
+             ui->tabWidget->setTabEnabled(5, false);
+             ui->tabWidget->setTabEnabled(6, false);
+         }
+        else  if (loginObject.validateLogin(enteredUsername, enteredPassword)==5) {
+             ui->tabWidget->setCurrentIndex(5);
+             ui->tabWidget->setTabEnabled(5, true);
+             ui->tabWidget->setTabEnabled(0, false);
+             ui->tabWidget->setTabEnabled(1, false);
+             ui->tabWidget->setTabEnabled(3, false);
+             ui->tabWidget->setTabEnabled(4, false);
+             ui->tabWidget->setTabEnabled(2, false);
+             ui->tabWidget->setTabEnabled(6, false);
+         }
+        else  if (loginObject.validateLogin(enteredUsername, enteredPassword)==6) {
+             ui->tabWidget->setCurrentIndex(6);
+             ui->tabWidget->setTabEnabled(6, true);
+             ui->tabWidget->setTabEnabled(0, false);
+             ui->tabWidget->setTabEnabled(1, false);
+             ui->tabWidget->setTabEnabled(3, false);
+             ui->tabWidget->setTabEnabled(4, false);
+             ui->tabWidget->setTabEnabled(5, false);
+             ui->tabWidget->setTabEnabled(2, false);
+         }
+        else  if (loginObject.validateLogin(enteredUsername, enteredPassword)==0) {
+             ui->tabWidget->setCurrentIndex(0);
+             ui->tabWidget->setTabEnabled(2, false);
+             ui->tabWidget->setTabEnabled(1, false);
+             ui->tabWidget->setTabEnabled(3, false);
+             ui->tabWidget->setTabEnabled(4, false);
+             ui->tabWidget->setTabEnabled(5, false);
+             ui->tabWidget->setTabEnabled(6, false);
+         }
+        else
+        {
+            QMessageBox::warning(this, "Erreur de connexion", "Identifiants incorrects !");
+        }
+        ui->lineEdit_id_login->clear();
+        ui->lineEdit_mdp_login->clear();
+
+
+}*/
+
+
+
+
+void MainWindow::on_pushButton_clicked() // QR CODE
+{
+    QString cin = ui->lineEdit_codeQR->text(); // Obtenir la valeur de CIN à partir du line edit
+
+    if (!cin.isEmpty()) {
+        QSqlQuery qry;
+        qry.prepare("SELECT nom, prenom, email, date_embauche, salaire, poste, cin, mot_de_passe FROM employes WHERE CIN=:cin");
+        qry.bindValue(":cin", cin);
+        qry.exec();
+
+        if (qry.next()) {
+            QString nom = qry.value(0).toString();
+            QString prenom = qry.value(1).toString();
+            QString email = qry.value(2).toString();
+            QString date_embauche = qry.value(3).toString();
+            int salaire = qry.value(4).toInt();
+            QString poste = qry.value(5).toString();
+            QString mot_de_passe = qry.value(7).toString();
+
+            // Création de la chaîne d'informations de l'employé
+            QString ide = "Nom: " + nom + "\nPrénom: " + prenom +
+                          "\nEmail: " + email + "\nDate d'embauche: " + date_embauche +
+                          "\nSalaire: " + QString::number(salaire) + "\nPoste: " + poste +
+                          "\nCIN: " + cin + "\nMot de passe: " + mot_de_passe;
+
+            // Encoder les informations de l'employé dans un code QR
+            QrCode qr = QrCode::encodeText(ide.toUtf8().constData(), QrCode::Ecc::HIGH);
+
+            // Convertir le code QR en une image avec une marge autour
+            int margin = 40; // Taille de la marge (multipliée par 2 pour une taille deux fois plus grande)
+            QImage im(qr.getSize() + 2 * margin, qr.getSize() + 2 * margin, QImage::Format_RGB888);
+            im.fill(Qt::white); // Remplir l'image avec du blanc
+            for (int y = 0; y < qr.getSize(); y++) {
+                for (int x = 0; x < qr.getSize(); x++) {
+                    int color = qr.getModule(x, y); // 0 pour blanc, 1 pour noir
+                    im.setPixelColor(x + margin, y + margin, (color == 0) ? Qt::white : Qt::black);
+                }
+            }
+
+            // Afficher l'image du code QR avec une taille agrandie dans l'interface utilisateur
+            ui->qrCode->setPixmap(QPixmap::fromImage(im).scaled(300, 300)); // Taille de l'affichage : largeur 300, hauteur 300
+
+        } else {
+            QMessageBox::warning(this, "Erreur", "CIN non trouvé dans la base de données.");
+        }
+    }
+}
+
+
+/*
+void MainWindow::on_pushButton_clicked() // QR CODE
+{
+    QString cin = ui->lineEdit_codeQR->text(); // Obtenir la valeur de CIN à partir du line edit
+
+    if (!cin.isEmpty()) {
+        QSqlQuery qry;
+        qry.prepare("SELECT nom, prenom,email, date_embauche,salaire,poste,cin,mot_de_passe FROM employes WHERE CIN=:cin");
+        qry.bindValue(":cin", cin);
+        qry.exec();
+
+        if (qry.next()) {
+            QString nom = qry.value(0).toString();
+            QString prenom = qry.value(1).toString();
+            QString email = qry.value(2).toString();
+            QString date_embauche = qry.value(3).toString();
+            int salaire = qry.value(4).toInt();
+            QString poste = qry.value(5).toString();
+            QString mot_de_passe = qry.value(6).toString();
+
+            // Création de la chaîne d'informations de l'employé
+            QString ide = "Nom: " + nom + "\nPrénom: " + prenom +
+                          "\nEmail: " + email + "\nDate d'embauche: " + date_embauche +
+                          "\nSalaire: " + QString::number(salaire) + "\nPoste: " + poste +
+                          "\nCIN: " + cin + "\nMot de passe: " + mot_de_passe;
+
+            // Encoder les informations de l'employé dans un code QR
+            QrCode qr = QrCode::encodeText(ide.toUtf8().constData(), QrCode::Ecc::HIGH);
+
+            // Convertir le code QR en une image avec une marge autour
+            int margin = 10; // Taille de la marge (en pixels)
+            QImage im(qr.getSize() + 2 * margin, qr.getSize() + 2 * margin, QImage::Format_RGB888);
+            im.fill(Qt::white); // Remplir l'image avec du blanc
+            for (int y = 0; y < qr.getSize(); y++) {
+                for (int x = 0; x < qr.getSize(); x++) {
+                    int color = qr.getModule(x, y); // 0 pour blanc, 1 pour noir
+                    im.setPixelColor(x + margin, y + margin, (color == 0) ? Qt::white : Qt::black);
+                }
+            }
+
+            // Afficher l'image du code QR
+            ui->qrCode->setPixmap(QPixmap::fromImage(im));
+        }
+    }
+}
+*/
+
+
+/*
+void MainWindow::on_pushButton_clicked() // QR CODE
+{
+    QString cin = ui->lineEdit_codeQR->text(); // Obtenir la valeur de CIN à partir du line edit
+
+    if (!cin.isEmpty()) {
+        QSqlQuery qry;
+        qry.prepare("SELECT nom, prenom,email, date_embauche,salaire,poste,cin,mot_de_passe FROM employes WHERE CIN=:cin");
+        qry.bindValue(":cin", cin);
+        qry.exec();
+
+        if (qry.next()) {
+            QString nom = qry.value(0).toString();
+            QString prenom = qry.value(1).toString();
+            QString email = qry.value(2).toString();
+            QString date_embauche = qry.value(3).toString();
+            int salaire = qry.value(4).toInt();
+            QString poste = qry.value(5).toString();
+            QString mot_de_passe = qry.value(6).toString();
+
+            // Création de la chaîne d'informations de l'employé
+            QString ide = "Nom: " + nom + "\nPrénom: " + prenom +
+                          "\nEmail: " + email + "\nDate d'embauche: " + date_embauche +
+                          "\nSalaire: " + QString::number(salaire) + "\nPoste: " + poste +
+                          "\nCIN: " + cin + "\nMot de passe: " + mot_de_passe;
+
+            // Encoder les informations de l'employé dans un code QR
+            QrCode qr = QrCode::encodeText(ide.toUtf8().constData(), QrCode::Ecc::HIGH);
+
+            // Convertir le code QR en une image
+            QImage im(qr.getSize(), qr.getSize(), QImage::Format_RGB888);
+            for (int y = 0; y < qr.getSize(); y++) {
+                for (int x = 0; x < qr.getSize(); x++) {
+                    int color = qr.getModule(x, y); // 0 pour blanc, 1 pour noir
+
+                    // Définir la couleur du pixel en fonction du module du code QR
+                    if (color == 0)
+                        im.setPixel(x, y, qRgb(254, 254, 254)); // Blanc
+                    else
+                        im.setPixel(x, y, qRgb(0, 0, 0)); // Noir
+                }
+            }
+
+            // Redimensionner et afficher l'image du code QR
+            im = im.scaled(200, 200);
+            ui->qrCode->setPixmap(QPixmap::fromImage(im));
+
+            // **Nouveau code : Ouvrir une nouvelle fenêtre avec les informations de l'employé**
+            QDialog dialog;
+            QVBoxLayout layout(&dialog);
+
+            // QLabel pour afficher le nom de l'employé
+            QLabel *nomLabel = new QLabel("Nom: " + nom);
+            layout.addWidget(nomLabel);
+
+            // ... Répétez le processus pour les autres informations (prénom, email, etc.)
+
+            // Afficher le bouton "Fermer"
+           // QPushButton *closeButton = new QPushButton("Fermer");
+           // layout.addWidget(closeButton);
+
+          //  QObject::connect(closeButton, &QPushButton::clicked, &dialog, &QDialog::close);
+
+            dialog.exec();
+        }
+    }
+}
+*/
+
+/*
+void MainWindow::on_pushButton_clicked() // QR CODE
+{
+    QString cin = ui->lineEdit_codeQR->text(); // Obtenir la valeur de CIN à partir du line edit
+
+    if (!cin.isEmpty()) {
+        QSqlQuery qry;
+        qry.prepare("SELECT nom, prenom,email, date_embauche,salaire,poste,cin,mot_de_passe FROM employes WHERE CIN=:cin");
+        qry.bindValue(":cin", cin);
+        qry.exec();
+
+        if (qry.next()) {
+            QString nom = qry.value(0).toString();
+            QString prenom = qry.value(1).toString();
+            QString email = qry.value(2).toString();
+            QString date_embauche = qry.value(3).toString();
+            int salaire = qry.value(4).toInt();
+            QString poste = qry.value(5).toString();
+            QString mot_de_passe = qry.value(6).toString();
+
+            // Création de la chaîne d'informations de l'employé
+            QString ide = "Nom: " + nom + "\nPrénom: " + prenom +
+                          "\nEmail: " + email + "\nDate d'embauche: " + date_embauche +
+                          "\nSalaire: " + QString::number(salaire) + "\nPoste: " + poste +
+                          "\nCIN: " + cin + "\nMot de passe: " + mot_de_passe;
+
+            // Encoder les informations de l'employé dans un code QR
+            QrCode qr = QrCode::encodeText(ide.toUtf8().constData(), QrCode::Ecc::HIGH);
+
+            // Convertir le code QR en une image
+            QImage im(qr.getSize(), qr.getSize(), QImage::Format_RGB888);
+            for (int y = 0; y < qr.getSize(); y++) {
+                for (int x = 0; x < qr.getSize(); x++) {
+                    int color = qr.getModule(x, y); // 0 pour blanc, 1 pour noir
+
+                    // Définir la couleur du pixel en fonction du module du code QR
+                    if (color == 0)
+                        im.setPixel(x, y, qRgb(254, 254, 254)); // Blanc
+                    else
+                        im.setPixel(x, y, qRgb(0, 0, 0)); // Noir
+                }
+            }
+
+            // Redimensionner et afficher l'image du code QR
+            im = im.scaled(200, 200);
+            ui->qrCode->setPixmap(QPixmap::fromImage(im));
+        }
+    }
+}
+
+*/
+/*
+void MainWindow::on_pushButton_clicked() // QR CODE
+{
+    QString cin = ui->lineEdit_codeQR->text(); // Obtenir la valeur de CIN à partir du line edit
+
+    if (!cin.isEmpty()) {
+        QSqlQuery qry;
+        qry.prepare("SELECT nom, prenom,email, date_embauche,salaire,poste,cin,mot_de_passe FROM employes WHERE CIN=:cin");
+        qry.bindValue(":cin", cin);
+        qry.exec();
+
+        if (qry.next()) {
+
+            QString nom = qry.value(0).toString();
+            QString prenom = qry.value(1).toString();
+            QString email = qry.value(2).toString();
+            QString date_embauche = qry.value(3).toString();
+            int salaire = qry.value(4).toInt();
+           // QString salaire = qry.value(4).toString();
+            QString poste = qry.value(5).toString();
+           // QString mot_de_passe = qry.value(7).toString();
+
+            QString ide =  ", NOM:" + nom + ", PRÉNOM:" + prenom + ", EMAIL:" + email +
+                          ", DATE_EMBAUCHE:" + date_embauche + ", SALAIRE:" + salaire + ", POSTE:" + poste +
+                          ", CIN:" + cin; // + ", MOT_DE_PASSE:" + mot_de_passe;
+
+            QrCode qr = QrCode::encodeText(ide.toUtf8().constData(), QrCode::Ecc::HIGH);
+
+            // Lire les pixels en noir et blanc
+            QImage im(qr.getSize(), qr.getSize(), QImage::Format_RGB888);
+            for (int y = 0; y < qr.getSize(); y++) {
+                for (int x = 0; x < qr.getSize(); x++) {
+                    int color = qr.getModule(x, y); // 0 pour blanc, 1 pour noir
+
+                    // Vous devez modifier cette partie
+                    if (color == 0)
+                        im.setPixel(x, y, qRgb(254, 254, 254));
+                    else
+                        im.setPixel(x, y, qRgb(0, 0, 0));
+                }
+            }
+            im = im.scaled(200, 200);
+            ui->qrCode->setPixmap(QPixmap::fromImage(im));
+        }
+    }
+}
+*/
+/*
+void MainWindow::on_QR_clicked()
+{
+    if(ui->tableView->currentIndex().row()==-1)
+                        QMessageBox::information(nullptr, QObject::tr("suppression"),
+                                                 QObject::tr("Veuillez Choisir un num_voyage du tab.\n"
+                                                             "Click Ok to exit."), QMessageBox::Ok);
+                    else
+                    {
+                         int  Code=ui->tableView->model()->data(ui->tableView->model()->index(ui->tableView->currentIndex().row(),0)).toInt();
+                         const qrcodegen::QrCode qr = qrcodegen::QrCode::encodeText(std::to_string(Code).c_str(), qrcodegen::QrCode::Ecc::LOW);
+                         std::ofstream myfile;
+                         myfile.open ("qrcode.svg") ;
+                       //  myfile << qr.toSvgString(1);
+                         myfile.flush();
+                         myfile.close();
+                     //   QSvgRenderer svgRenderer(QString("qrcode.svg"));
+                         QPixmap pix( QSize(90, 90) );
+                         QPainter pixPainter( &pix );
+                      //  svgRenderer.render(&pixPainter);
+                         ui->qrCode->setPixmap(pix);
+                    }
+}
+
+*/
+
+
+void MainWindow::on_clear_clicked()
+{
+    ui->qrCode->clear();
+    ui->labelMessage->clear();
+    ui->lineEdit_codeQR->clear();
+}
+
+void MainWindow::on_EnregistrerQRCode_clicked()
+{
+    // Vérifier si une image est affichée dans qrCode
+    if (ui->qrCode->pixmap() != nullptr && !ui->qrCode->pixmap()->isNull()) {
+        // Récupérer l'image affichée dans l'interface
+        QPixmap pixmap = ui->qrCode->pixmap()->scaled(400, 400); // Taille de l'image : 400x400 pixels
+
+        // Enregistrer l'image dans le répertoire spécifié
+        QString cin = ui->lineEdit_codeQR->text();
+        if (!cin.isEmpty()) {
+            QString filePath = "C:/Users/MSI/OneDrive - ESPRIT/Bureau/Nouveau dossier/projet/" + cin + ".png";
+            if (pixmap.save(filePath, "PNG")) {
+                QString message = "Image enregistrée avec succès sous le chemin:\n" + filePath;
+                ui->labelMessage->setText(message); // Mettre à jour le texte du QLabel
+                ui->labelMessage->setStyleSheet("color: green;"); // Changer la couleur du texte en vert (facultatif)
+            } else {
+                ui->labelMessage->setText("Erreur lors de l'enregistrement de l'image.");
+                ui->labelMessage->setStyleSheet("color: red;"); // Changer la couleur du texte en rouge (facultatif)
+            }
+        } else {
+            ui->labelMessage->setText("Le champ CIN est vide.");
+            ui->labelMessage->setStyleSheet("color: red;"); // Changer la couleur du texte en rouge (facultatif)
+        }
+    } else {
+        ui->labelMessage->setText("Aucune image de code QR à enregistrer.");
+        ui->labelMessage->setStyleSheet("color: red;"); // Changer la couleur du texte en rouge (facultatif)
+    }
+    ui->lineEdit_codeQR->clear();
+}

@@ -3,7 +3,11 @@
 #include <QString>
 #include <QSqlQuery>
 #include <QSqlQueryModel>
-
+#include <QChartView>
+#include <QtCharts>
+#include <QImage>
+#include <QPixmap>
+//#include <QZXing>
 class Employee
 {
 private:
@@ -32,7 +36,7 @@ void setposte(QString n);
 void setcin(int n);
 void setemail(QString n);
 void setmot_de_passe(QString n);
-bool ajouter();
+bool ajouter(QString);
 QSqlQueryModel * afficher();
 bool supprimer(int );
 bool update(int);
@@ -40,6 +44,14 @@ QSqlQueryModel* Rechercher(int );
 QSqlQueryModel* tri();
 
 void genererPDFact();
+QChartView * stat();
+QPixmap generateQRCode() const;
+static bool isCinUnique(int cin);
+bool verifierCIN(int cin) ;
+
+
+
+
 };
 
 #endif // EMPLOYEE_H

@@ -32,6 +32,11 @@ public:
 
 
 private slots:
+void displaySalaryChart();
+ void clearStatistics();
+void validateCIN();
+ void updateMessageLabel(const QString &text);
+ void validateAndAddCIN();
 // Louay :
 
     //BOUTTON D'AJOUT, AFFICHAGE ET SUPPRESSION
@@ -147,7 +152,18 @@ void updateTableWidgetM();
 
     void on_pushButton_trierpod_clicked();
 
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_clicked();
+
+    void on_QR_clicked();
+
+    void on_clear_clicked();
+
+    void on_EnregistrerQRCode_clicked();
+
 signals:
+     void employeeAdded();
     void dataUpdated(); // Declare the dataUpdated signal
     void dataUpdatedS();
     void dataUpdatedM(); // Declare the dataUpdated signal
@@ -157,13 +173,14 @@ private:
     QSqlQueryModel *modelI; // Declare a member variable for the model
     QHash<int, int> idToRowMap;
     Ui::MainWindow *ui;
+
     Employee e;
 
      QStandardItemModel *model; // Déclaration du modèle ici
 
     podcast p;
      Transaction Etmp;
-
+ QList<int> cinList;
    //  SortedStringListModel *listeNotifications_Transactions;
 };
 #endif // MAINWINDOW_H

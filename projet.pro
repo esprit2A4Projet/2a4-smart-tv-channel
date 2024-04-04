@@ -2,11 +2,13 @@ QT       += core gui  sql
 QT += sql
 QT += core gui printsupport
 QT += widgets
+QT       += charts
+QT += multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+QT += multimedia
 CONFIG += c++11
-
+QT       += charts
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -22,10 +24,12 @@ SOURCES += \
     connection.cpp \
     employee.cpp \
     invite.cpp \
+    login.cpp \
     main.cpp \
     mainwindow.cpp \
     materiaux.cpp \
     podcast.cpp \
+    qrcodegen.cpp \
     sponsor.cpp \
     transaction.cpp
 
@@ -33,9 +37,11 @@ HEADERS += \
     connection.h \
     employee.h \
     invite.h \
+    login.h \
     mainwindow.h \
     materiaux.h \
     podcast.h \
+    qrcodegen.hpp \
     sponsor.h \
     transaction.h
 
@@ -49,6 +55,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     RES.qrc \
+    az.qrc \
     cap.qrc \
     capt.qrc \
     captures.qrc \

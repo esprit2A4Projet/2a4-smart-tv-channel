@@ -70,7 +70,7 @@ QSqlQueryModel* podcast::afficherp(){
 
  return model;
 }
-
+/*
 bool podcast::supprimerp(int id)
 {
     QSqlQuery query;
@@ -78,18 +78,18 @@ bool podcast::supprimerp(int id)
     query.addBindValue(id);
     return query.exec();
 }
+*/
 
 
-/*
-bool podcast::supprimerp(int id)
+bool podcast::supprimerp(QString)
 {
 
     QSqlQuery query;
            query.prepare("Delete from PODCASTS where nom=:nom");
-           query.bindValue(0, id);
+            query.addBindValue(nom);
             return query.exec();
 }
-*/
+
 
 // Dans podcast.cpp
 bool podcast::update(int id, const QString& newNom, const QString& duree, const QString& lieu, const QString& categorie, const QString& date_pod)
