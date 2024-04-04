@@ -212,22 +212,6 @@ color: red;
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="widget_2" native="true">
-    <property name="geometry">
-     <rect>
-      <x>1100</x>
-      <y>10</y>
-      <width>41</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-image: url(C:/Users/ibtis/OneDrive/Desktop/ESPRIT/2A4/Sem2/Projet Qt/initiation/logo.png);
-background-repeat: no-repeat;
-background-position: center;
-</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="widget_3" native="true">
     <property name="geometry">
      <rect>
@@ -247,11 +231,17 @@ background-position: center;
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>170</x>
       <y>10</y>
       <width>1001</width>
       <height>601</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="styleSheet">
      <string notr="true">QTabWidget::tab-bar {
@@ -274,7 +264,7 @@ border-radius: 10px; /* Adjust the radius for the rounded corners */
 </string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -405,7 +395,7 @@ border-radius: 12px; /* Adjust the radius for the title bar's corners */
         </rect>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_ajouter">
+      <widget class="QPushButton" name="pushButton_ajouterInvite">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -442,7 +432,7 @@ QPushButton {
         <string>Ajouter</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_annuler">
+      <widget class="QPushButton" name="pushButton_annulerInvite">
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -727,7 +717,7 @@ QPushButton {
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_rechercher">
+     <widget class="QPushButton" name="pushButton_rechercherInvite">
       <property name="geometry">
        <rect>
         <x>470</x>
@@ -789,7 +779,7 @@ QPushButton {
        <string>Trier par</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="comboBoxTri">
       <property name="geometry">
        <rect>
         <x>680</x>
@@ -798,13 +788,21 @@ QPushButton {
         <height>22</height>
        </rect>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::NoContextMenu</enum>
+      </property>
       <item>
        <property name="text">
         <string>Nombre d'abonnés</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>Nombre de participation</string>
+       </property>
+      </item>
      </widget>
-     <widget class="QPushButton" name="pushButton_trier">
+     <widget class="QPushButton" name="pushButton_trierInvite">
       <property name="geometry">
        <rect>
         <x>830</x>
@@ -857,7 +855,7 @@ background-position: center;
 </string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_exporter">
+     <widget class="QPushButton" name="pushButton_exporterInvite">
       <property name="geometry">
        <rect>
         <x>310</x>
@@ -894,7 +892,7 @@ QPushButton {
        <string>Exportation</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_update">
+     <widget class="QPushButton" name="pushButton_updateInvite">
       <property name="geometry">
        <rect>
         <x>770</x>
@@ -931,7 +929,7 @@ QPushButton {
        <string>Modifier</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_delete">
+     <widget class="QPushButton" name="pushButton_deleteInvite">
       <property name="geometry">
        <rect>
         <x>850</x>
@@ -1015,13 +1013,12 @@ QTableWidget::corner-button {
 QTableWidget::item, QHeaderView::section {
     font-family: &quot;Space Grotesk&quot;; /* Set font family */
     font-weight: bold; /* Make the font bold */
+}
+QTableWidget::item {
+    color: white; /* Définir la couleur du texte par défaut */
+    padding: 2px; /* Ajuster le rembourrage si nécessaire */
 }</string>
       </property>
-      <column>
-       <property name="text">
-        <string>ID</string>
-       </property>
-      </column>
       <column>
        <property name="text">
         <string>Nom</string>
@@ -1062,7 +1059,7 @@ QTableWidget::item, QHeaderView::section {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>10</y>
+        <y>0</y>
         <width>1031</width>
         <height>141</height>
        </rect>
@@ -1073,44 +1070,347 @@ background-repeat: no-repeat;
 background-position: center;
 </string>
       </property>
+      <widget class="QWidget" name="widget_2" native="true">
+       <property name="geometry">
+        <rect>
+         <x>930</x>
+         <y>-30</y>
+         <width>41</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-image: url(C:/Users/ibtis/OneDrive/Desktop/ESPRIT/2A4/Sem2/Projet Qt/initiation/logo.png);
+background-repeat: no-repeat;
+background-position: center;
+</string>
+       </property>
+      </widget>
      </widget>
-     <widget class="QWidget" name="widget_5" native="true">
+     <widget class="QCalendarWidget" name="calendarWidget">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>190</y>
+        <width>421</width>
+        <height>241</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/* Barre de navigation */
+
+QCalendarWidget {
+    background-color: #FFFFFF; /* Couleur de fond pour le calendrier */
+    border: 2px solid #D1D0FB; /* Bordure de 2px de large en couleur mauve claire */
+    border-radius: 10px; /* Rayon de courbure de la bordure */
+}
+QCalendarWidget QWidget#qt_calendar_navigationbar {
+    background-color: #D1D0FB; /* Couleur de fond pour la barre de navigation */
+}
+
+QCalendarWidget QToolButton {
+    color: white;
+    font-size: 16px;
+    icon-size: 24px, 24px;
+    
+}
+
+QCalendarWidget QMenu {
+    color: white;
+    font-size: 14px;
+    background-color: #D1D0FB; /* Couleur de fond pour le menu de la barre de navigation */
+}
+
+QCalendarWidget QSpinBox {
+    font-size: 16px;
+    color: white;
+   /* background-color: #D1D0FB; /* Couleur de fond pour le spin box de la barre de navigation */*/
+    selection-background-color: #E8E8FD; /* Couleur de fond pour la sélection */
+    selection-color: rgb(255, 255, 255);
+}
+
+QCalendarWidget QSpinBox::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+}
+
+QCalendarWidget QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+}
+
+/* Ligne d'en-tête */
+QCalendarWidget QWidget {
+    alternate-background-color: #E8E8FD; /* Couleur de fond pour l'en-tête */
+}
+
+/* Jours normaux */
+QCalendarWidget QAbstractItemView:enabled {
+    color: rgb(180, 180, 180);
+    background-color: white;
+    selection-background-color: rgb(64, 64, 64);
+    selection-color: rgb(0, 255, 0);
+}
+
+/* Jours dans d'autres mois */
+QCalendarWidget QAbstractItemView:disabled {
+    color: rgb(64, 64, 64);
+}
+</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_rafraichir">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>490</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Space Grotesk</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}
+/* Push Button Styling */
+QPushButton {
+    background-color: #E8E8FD; /* Set the background color for the push button */
+    border: 2px solid #D1D0FB; /* Set the border color */
+    border-radius: 10px; /* Adjust the radius for the rounded corners */
+    color: #000000; /* Set the text color */
+    font-family: &quot;Space Grotesk&quot;;
+
+}
+
+
+</string>
+      </property>
+      <property name="text">
+       <string>Rafraîchir</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>160</y>
+        <width>421</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Space Grotesk</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>L'invitation des invités pour les dates des podcasts affichés</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_emailInvite">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>460</y>
+        <width>181</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>440</y>
+        <width>121</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Space Grotesk</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}</string>
+      </property>
+      <property name="text">
+       <string>Email de l'invité</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_envoyer">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>460</y>
+        <width>151</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Space Grotesk</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}
+/* Push Button Styling */
+QPushButton {
+    background-color: #E8E8FD; /* Set the background color for the push button */
+    border: 2px solid #D1D0FB; /* Set the border color */
+    border-radius: 10px; /* Adjust the radius for the rounded corners */
+    color: #000000; /* Set the text color */
+    font-family: &quot;Space Grotesk&quot;;
+
+}
+
+
+</string>
+      </property>
+      <property name="text">
+       <string>Envoyer un E-mail</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_emailInviteError">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>490</y>
+        <width>191</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:#D1D0FB;</string>
+      </property>
+      <property name="text">
+       <string>Email Invalide</string>
+      </property>
+     </widget>
+     <widget class="QFrame" name="statS">
       <property name="geometry">
        <rect>
         <x>510</x>
-        <y>260</y>
-        <width>391</width>
-        <height>211</height>
+        <y>160</y>
+        <width>441</width>
+        <height>322</height>
        </rect>
       </property>
-      <property name="styleSheet">
-       <string notr="true">background-image: url(C:/Users/ibtis/OneDrive/Desktop/ESPRIT/2A4/Sem2/Projet Qt/initiation/autres.png);
-background-repeat: no-repeat;
-background-position: center;
-</string>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
       </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
+      </layout>
      </widget>
-     <widget class="QWidget" name="widget_6" native="true">
+     <widget class="QPushButton" name="pushButton_actualiser">
       <property name="geometry">
        <rect>
-        <x>-230</x>
-        <y>120</y>
-        <width>601</width>
-        <height>471</height>
+        <x>520</x>
+        <y>490</y>
+        <width>121</width>
+        <height>28</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>Space Grotesk</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="styleSheet">
-       <string notr="true">background-image: url(C:/Users/ibtis/OneDrive/Desktop/ESPRIT/2A4/Sem2/Projet Qt/initiation/sss.png);
-background-repeat: no-repeat;
-background-position: center;
+       <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}
+/* Push Button Styling */
+QPushButton {
+    background-color: #E8E8FD; /* Set the background color for the push button */
+    border: 2px solid #D1D0FB; /* Set the border color */
+    border-radius: 10px; /* Adjust the radius for the rounded corners */
+    color: #000000; /* Set the text color */
+    font-family: &quot;Space Grotesk&quot;;
+
+}
+
+
 </string>
+      </property>
+      <property name="text">
+       <string>Actualiser</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_imprimer">
+      <property name="geometry">
+       <rect>
+        <x>820</x>
+        <y>490</y>
+        <width>121</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Space Grotesk</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}
+/* Push Button Styling */
+QPushButton {
+    background-color: #E8E8FD; /* Set the background color for the push button */
+    border: 2px solid #D1D0FB; /* Set the border color */
+    border-radius: 10px; /* Adjust the radius for the rounded corners */
+    color: #000000; /* Set the text color */
+    font-family: &quot;Space Grotesk&quot;;
+
+}
+
+
+</string>
+      </property>
+      <property name="text">
+       <string>Imprimer</string>
       </property>
      </widget>
     </widget>
    </widget>
    <zorder>tabWidget</zorder>
    <zorder>groupBox_2</zorder>
-   <zorder>widget_2</zorder>
    <zorder>widget_3</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">

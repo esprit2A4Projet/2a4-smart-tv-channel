@@ -4,6 +4,7 @@
 #include <QSqlQuery>
 #include <QSqlQueryModel>
 #include <QTableWidget>
+#include <QCalendarWidget>
 
 class Invite
 {
@@ -37,7 +38,11 @@ public:
     //Fonctionnalites
     void rechercherInvite(const QString &searchTerm, QTableWidget *tableWidget);
     bool trierParNbAbonnes(QTableWidget *tableWidget);
+    bool trierParNbParticipations(QTableWidget *tableWidget);
     bool exportToPDF(const QString &filePath, QTableWidget *tableWidget);
+    void afficherDatePodcastsCalendrier(QCalendarWidget *calendarWidget);
+    void effacerDatesPodcastsCalendrier(QCalendarWidget *calendarWidget);
+
 
 private:
     int id,nbAbonnes,nbParticipation;

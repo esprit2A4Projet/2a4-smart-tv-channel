@@ -1,4 +1,6 @@
-QT       += core gui sql printsupport
+QT       += core gui sql printsupport network charts
+LIBS += -LC:/OpenSSL/win32/lib
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,12 +21,14 @@ SOURCES += \
     connection.cpp \
     invite.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    smtp.cpp
 
 HEADERS += \
     connection.h \
     invite.h \
-    mainwindow.h
+    mainwindow.h \
+    smtp.h
 
 FORMS += \
     mainwindow.ui
