@@ -1,3 +1,4 @@
+//mateiraux.h
 #ifndef MATERIAUX_H
 #define MATERIAUX_H
 #include <QString>

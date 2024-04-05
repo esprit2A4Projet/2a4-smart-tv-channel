@@ -104,7 +104,7 @@ color: white;
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>260</y>
+       <y>330</y>
        <width>91</width>
        <height>21</height>
       </rect>
@@ -117,7 +117,7 @@ color: white;
 }</string>
      </property>
      <property name="text">
-      <string>Logistique</string>
+      <string>Finance</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_invites">
@@ -164,7 +164,7 @@ color: white;
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>330</y>
+       <y>260</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -182,7 +182,7 @@ color: #04103B;
 }</string>
      </property>
      <property name="text">
-      <string>Finance</string>
+      <string>Logistique</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_13">
@@ -210,7 +210,7 @@ color: red;
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>-10</y>
+      <y>10</y>
       <width>951</width>
       <height>641</height>
      </rect>
@@ -597,7 +597,7 @@ QPushButton {
       <property name="geometry">
        <rect>
         <x>270</x>
-        <y>540</y>
+        <y>130</y>
         <width>191</width>
         <height>41</height>
        </rect>
@@ -647,7 +647,7 @@ QPushButton {
       <property name="geometry">
        <rect>
         <x>280</x>
-        <y>190</y>
+        <y>500</y>
         <width>151</width>
         <height>22</height>
        </rect>
@@ -657,9 +657,9 @@ QPushButton {
       <property name="geometry">
        <rect>
         <x>790</x>
-        <y>200</y>
+        <y>130</y>
         <width>121</width>
-        <height>31</height>
+        <height>41</height>
        </rect>
       </property>
       <property name="font">
@@ -693,8 +693,8 @@ QPushButton {
      <widget class="QTableWidget" name="tableWidgetM">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>240</y>
+        <x>270</x>
+        <y>180</y>
         <width>641</width>
         <height>291</height>
        </rect>
@@ -743,8 +743,8 @@ QTableWidget::item, QHeaderView::section {
      <widget class="QPushButton" name="pushButton_ModificationMateriaux">
       <property name="geometry">
        <rect>
-        <x>720</x>
-        <y>540</y>
+        <x>690</x>
+        <y>490</y>
         <width>101</width>
         <height>31</height>
        </rect>
@@ -773,8 +773,8 @@ QPushButton {
      <widget class="QPushButton" name="pushButton_SuppressionMateriaux">
       <property name="geometry">
        <rect>
-        <x>830</x>
-        <y>540</y>
+        <x>800</x>
+        <y>490</y>
         <width>101</width>
         <height>31</height>
        </rect>
@@ -804,7 +804,7 @@ QPushButton {
       <property name="geometry">
        <rect>
         <x>280</x>
-        <y>170</y>
+        <y>480</y>
         <width>241</width>
         <height>16</height>
        </rect>
@@ -816,8 +816,8 @@ QPushButton {
      <widget class="QLabel" name="label_7">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>210</y>
+        <x>270</x>
+        <y>480</y>
         <width>371</width>
         <height>31</height>
        </rect>
@@ -852,7 +852,7 @@ QPushButton {
       <property name="geometry">
        <rect>
         <x>400</x>
-        <y>190</y>
+        <y>560</y>
         <width>41</width>
         <height>21</height>
        </rect>
@@ -881,7 +881,7 @@ QPushButton {
       <property name="geometry">
        <rect>
         <x>440</x>
-        <y>190</y>
+        <y>500</y>
         <width>101</width>
         <height>21</height>
        </rect>
@@ -914,6 +914,80 @@ QPushButton {
        <string>Rechercher</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_selectMaterialsForPodcast">
+      <property name="geometry">
+       <rect>
+        <x>590</x>
+        <y>130</y>
+        <width>191</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Space Grotesk</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}
+/* Push Button Styling */
+QPushButton {
+    background-color: #E8E8FD; /* Set the background color for the push button */
+    border: 2px solid #D1D0FB; /* Set the border color */
+    border-radius: 10px; /* Adjust the radius for the rounded corners */
+    color: #000000; /* Set the text color */
+    font-family: &quot;Space Grotesk&quot;;
+
+}
+
+
+</string>
+      </property>
+      <property name="text">
+       <string>Sélectionner les matériaux</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_calculerBilan">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>130</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Space Grotesk</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}
+/* Push Button Styling */
+QPushButton {
+    background-color: #E8E8FD; /* Set the background color for the push button */
+    border: 2px solid #D1D0FB; /* Set the border color */
+    border-radius: 10px; /* Adjust the radius for the rounded corners */
+    color: #000000; /* Set the text color */
+    font-family: &quot;Space Grotesk&quot;;
+
+}
+
+
+</string>
+      </property>
+      <property name="text">
+       <string>Bilan Financier</string>
+      </property>
+     </widget>
      <zorder>label_logo</zorder>
      <zorder>groupBox_AjoutMateriaux</zorder>
      <zorder>label_illustration</zorder>
@@ -930,6 +1004,8 @@ QPushButton {
      <zorder>label_8</zorder>
      <zorder>label_10</zorder>
      <zorder>Button_RechercherM</zorder>
+     <zorder>pushButton_selectMaterialsForPodcast</zorder>
+     <zorder>pushButton_calculerBilan</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">

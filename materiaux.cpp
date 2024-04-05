@@ -170,4 +170,3 @@ QString Materiaux::get_type(){return type;}
 QString Materiaux::get_etat(){return etat;}
 QString Materiaux::get_quantite(){return quantite;}
 QString Materiaux::get_date(){return date;}
-

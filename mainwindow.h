@@ -1,3 +1,4 @@
+//mainwindow.h
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -5,6 +6,8 @@
 #include <QSqlQueryModel>
 #include <QComboBox>
 #include "Materiaux.h"
+#include <QTextEdit>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,8 +20,11 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+//    int getCurrentPodcastId();
+public slots:
     //MISE A JOUR DE LA TABLE
     void updateTableWidgetM();
+    void selectMaterialAndInsertIntoContenir();
 
 private slots:
 
@@ -32,7 +38,16 @@ private slots:
     void on_Button_trierParDateMateriaux_clicked();
     void on_pushButton_exportationFormatExcelMateriel_clicked();
     void searchMateriauxByType(const QString &type);
-    void selectMaterialsForPodcast();
+    //BILAN FINANCIER
+    void bilanFinancier();
+    void afficherResultatsBilanFinancier(QTextEdit *textEdit, double totalMateriaux, double totalTransactions, double totalRevenus, double totalDepenses, const QString& modesDePaiement);
+    void analyserTransactionsParCategorie(QTableWidget *tableWidget);
+    QString filtrerModesPaiement(const QString& modesDePaiement, const QString& typeTransaction);
+    QString getTypePaiement(const QString& mode);
+    QString getIdTransaction(const QString& mode);
+    void afficherMateriauxParTransaction(int idTransaction, QTextEdit *textEdit);
+    void exporterBilan(QTextEdit *textEditResultats);
+    //void exporterBilanCSV(QTextEdit *textEditResultats);
 
 
     //CONTROLE DE SAISIE
@@ -43,14 +58,18 @@ private slots:
     void handleCellClicked(int row, int column);
     void editnomCell(int row, int column);
 
+    void on_tabWidget_currentChanged(int index);
+    void showMaterialStats();
 
 
 signals:
     void dataUpdated(); // Declare the dataUpdated signal
+    void statisticsTabSelected();
 private:
     Ui::MainWindow *ui;
     Materiaux Etmp;
     QSqlQueryModel *model; // Declare a member variable for the model
+    QTextEdit *textEditResultats;
 };
 
 #endif // MAINWINDOW_H
