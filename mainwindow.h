@@ -5,6 +5,7 @@
 #include <QSqlQueryModel>
 #include <QListView>
 #include <QStringListModel>
+#include "todolist.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,46 +19,43 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-
 private slots:
     void updateTableWidget_S();
     void on_pushButton_ajouterS_clicked();
-
     void on_pushButton_supprimerS_clicked();
-
     void on_pushButton_modifierS_clicked();
-
     void on_pushButton_annulerS_clicked();
-
     void on_pushButton_rechercherS_clicked();
-
     void on_pushButton_trierS_clicked();
-
     void on_PDF_clicked();
-
     void on_pushButton_reset_clicked();
-
     void on_pushButton_annulerS2_clicked();
-
     void on_SMS_clicked();
 
-    //control de saisie
+    // Control de saisie
     void validateNom(const QString &text);
     void validateBudget(const QString &text);
-    //void validateDate(const QDate &startDate);
     void validateTelephone(const QString &text);
+    bool eventFilter(QObject *obj, QEvent *event);
     void statistiquesS();
 
-
+    // Slots for toolbar actions
+    void onAddToDo();
+    void onRemoveToDo();
+    void saveToDoListToFile(const QString& filename);
+    void loadToDoListFromFile(const QString& filename);
+    void closeEvent(QCloseEvent *event);
 
 signals:
     void dataUpdated();
+
 private:
     Ui::MainWindow *ui;
     QSqlQueryModel *model;
-    //dashboard
-
-
+    CToDoList *toDoListWidget;
+    QToolBar* mainToolBar;
+    QAction* addToDoAction;
+    QAction* removeToDoAction;
 };
 
 #endif // MAINWINDOW_H

@@ -26,12 +26,40 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QPieSlice>
-
+#include "todolist.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //dashboard
+    toDoListWidget = new CToDoList(this);
+
+
+        // Create a tab widget if it doesn't exist already
+        if (!ui->tabWidget) {
+            ui->tabWidget = new QTabWidget(this);
+            setCentralWidget(ui->tabWidget);
+        }
+
+        // Add the instance of CToDoList to the tab widget
+        ui->tabWidget->addTab(toDoListWidget, "To Do List");
+
+        mainToolBar = addToolBar("Main Toolbar");
+
+            // Create actions for the toolbar
+
+            addToDoAction = new QAction(QIcon(":/new/prefix3/add.png"), "Add To Do", this);
+            connect(addToDoAction, &QAction::triggered, this, &MainWindow::onAddToDo);
+            mainToolBar->addAction(addToDoAction);
+
+            removeToDoAction = new QAction(QIcon(":/new/prefix3/remove.png"), "Remove To Do", this);
+            connect(removeToDoAction, &QAction::triggered, this, &MainWindow::onRemoveToDo);
+            mainToolBar->addAction(removeToDoAction);
+
+
+            connect(this, &MainWindow::saveToDoListToFile, toDoListWidget, &CToDoList::saveToDoListToFile);
+            connect(this, &MainWindow::loadToDoListFromFile, toDoListWidget, &CToDoList::loadToDoListFromFile);
 
     connect(this, SIGNAL(dataUpdated()), this, SLOT(updateTableWidget_S())); // Connect the signal to the slot
 
@@ -47,13 +75,25 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_Date2Error->setVisible(false);
     ui->label_TelError->setVisible(false);
 
+    /*ui->label_NomError->installEventFilter(this);
+    ui->label_BudgetError->installEventFilter(this);
+    ui->label_DateError->installEventFilter(this);
+    ui->label_Date2Error->installEventFilter(this);
+    ui->label_TelError->installEventFilter(this);
+    ui->lineEdit_nomS->installEventFilter(this);
+    ui->lineEdit_budget->installEventFilter(this);
+    ui->lineEdit_tel->installEventFilter(this);
+    ui->dateEdit->installEventFilter(this);
+    ui->dateEdit_2->installEventFilter(this);*/
+
 
     connect(ui->lineEdit_nomS, &QLineEdit::textChanged, this, &MainWindow::validateNom);
     connect(ui->lineEdit_budget, &QLineEdit::textChanged, this, &MainWindow::validateBudget);
-    //connect(ui->dateEdit_2, &QDateEdit::dateChanged, this, &MainWindow::validateDate);
     connect(ui->lineEdit_tel, &QLineEdit::textChanged, this, &MainWindow::validateTelephone);
 
     statistiquesS();
+
+
 }
 
 MainWindow::~MainWindow()
@@ -388,7 +428,7 @@ void MainWindow::on_PDF_clicked()
 void MainWindow::on_SMS_clicked()
 {
     Sponsor s;
-    QMessageBox::warning(this, "Succes", "sms tenzal");
+    //QMessageBox::warning(this, "Succes", "sms tenzal");
     qInfo()<< QSslSocket::sslLibraryBuildVersionString();
     QString message= ui->smsEdit->toPlainText();
 
@@ -403,44 +443,88 @@ void MainWindow::on_pushButton_annulerS2_clicked()
     ui->smsEdit->clear();
 }
 
-/*
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == ui->lineEdit_nomS && (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease))
-    {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        QString text = ui->lineEdit_nomS->text();
+       {
+           QString text = ui->lineEdit_nomS->text();
 
-        // Your existing validation code goes here...
+           // Validation du nom
+           QRegExp rx("^[a-zA-Z _]+$");
+           bool isValid = text.length() <= 20 && rx.exactMatch(text);
+           ui->label_NomError->setVisible(!isValid);
+           ui->label_NomError->setStyleSheet(isValid ? "" : "color: red;");
+       }
 
-        // Clear the error label if the text is valid
-        if (text.isEmpty() || (text.toDouble() != 0.0 && text.toDouble() != 0.0))
-        {
-            ui->champs_erreur_ajout_Transaction->clear(); // Clear the error label
-        }
-    }
+       if (obj == ui->lineEdit_budget && (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease))
+       {
+           QString budgetText = ui->lineEdit_budget->text();
+           bool isValid = !budgetText.isEmpty() && budgetText.toDouble() >= 0;
+           ui->label_BudgetError->setVisible(!isValid);
+           ui->label_BudgetError->setStyleSheet(isValid ? "" : "color: red;");
+       }
+
+       if (obj == ui->dateEdit && (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease))
+       {
+           QString startDateText = ui->dateEdit->text();
+           QDate startDate = QDate::fromString(startDateText, "dd/MM/yyyy");
+
+           // Validation de la date de début
+           if (!startDate.isValid()) {
+               ui->label_DateError->setText("Date de début non valide. Utilisez le format dd/MM/yyyy.");
+               return true; // consume the event
+           }
+           else {
+               ui->label_DateError->clear(); // Clear the error label
+           }
+       }
+
+       if (obj == ui->dateEdit_2 && (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease))
+       {
+           QString endDateText = ui->dateEdit_2->text();
+           QDate endDate = QDate::fromString(endDateText, "dd/MM/yyyy");
+
+           // Validation de la date de fin
+           if (!endDate.isValid()) {
+               ui->label_Date2Error->setText("Date de fin non valide. Utilisez le format dd/MM/yyyy.");
+               return true; // consume the event
+           }
+           else {
+               ui->label_Date2Error->clear(); // Clear the error label
+           }
+       }
+
+       if (obj == ui->lineEdit_tel && (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease))
+       {
+           QString telephoneText = ui->lineEdit_tel->text();
+           bool isValid = telephoneText.length() == 8 && telephoneText.toInt();
+           ui->label_TelError->setVisible(!isValid);
+           ui->label_TelError->setStyleSheet(isValid ? "" : "color: red;");
+       }
+
 
     if (event->type() == QEvent::MouseButtonPress)
-    {
-        // Clear the result label
-        ui->champ_resultat_CRUD_Transaction->clear();
-
-        // Clear modification fields in the table
-        for (int r = 0; r < ui->table_de_transactions->rowCount(); ++r)
         {
-            for (int c = 0; c < ui->table_de_transactions->columnCount(); ++c)
+            // Clear the result label
+
+            // Clear modification fields in the table
+            for (int r = 0; r < ui->tableWidget_S->rowCount(); ++r)
             {
-                QWidget *cellWidget = ui->table_de_transactions->cellWidget(r, c);
-                if (cellWidget) {
-                    cellWidget->deleteLater();
+                for (int c = 0; c < ui->tableWidget_S->columnCount(); ++c)
+                {
+                    QWidget *cellWidget = ui->tableWidget_S->cellWidget(r, c);
+                    if (cellWidget) {
+                        cellWidget->deleteLater();
+                    }
                 }
             }
         }
-    }
+
+    // Handle other event types and widgets for validation...
 
     return QObject::eventFilter(obj, event);
 }
-*/
+
 
 void MainWindow::statistiquesS()
 {
@@ -492,3 +576,110 @@ void MainWindow::statistiquesS()
 
 }
 
+
+//**********************************dashbaord*******************************************************
+
+void MainWindow::onAddToDo() {
+    // Get the text for the new to-do item from the user or generate it programmatically
+    QString newItemText = " ";
+
+    // Call the addToDoItem method of CToDoList to add the new to-do item
+    toDoListWidget->onAdd(newItemText);
+}
+
+void MainWindow::onRemoveToDo() {
+    // Get the text for the new to-do item from the user or generate it programmatically
+    QString newItemText = " ";
+
+    // Call the addToDoItem method of CToDoList to add the new to-do item
+    toDoListWidget->onRemove(newItemText);
+}
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    saveToDoListToFile("todo_list.txt"); // Change the filename as needed
+    event->accept();
+}
+
+void MainWindow::saveToDoListToFile(const QString& filename)
+{
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+
+    // Save Pending items
+    out << "Pending Items:\n";
+    QStringListModel* pendingModel = qobject_cast<QStringListModel*>(toDoListWidget->m_pwPending->model());
+    if (pendingModel) {
+        QStringList pendingItems = pendingModel->stringList();
+        for (const QString& item : pendingItems)
+            out << item << "\n";
+    }
+
+    // Save Completed items
+    out << "\nCompleted Items:\n";
+    QStringListModel* completedModel = qobject_cast<QStringListModel*>(toDoListWidget->m_pwCompleted->model());
+    if (completedModel) {
+        QStringList completedItems = completedModel->stringList();
+        for (const QString& item : completedItems)
+            out << item << "\n";
+    }
+
+    file.close();
+}
+
+// Implement the loadToDoListFromFile function
+void MainWindow::loadToDoListFromFile(const QString& filename)
+{
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextStream in(&file);
+
+    QStringList pendingItems;
+    QStringList completedItems;
+    QString line;
+    enum { Pending, Completed, None } section = None;
+
+    while (!in.atEnd()) {
+        line = in.readLine().trimmed();
+
+        if (line == "Pending Items:") {
+            section = Pending;
+            continue;
+        }
+        else if (line == "Completed Items:") {
+            section = Completed;
+            continue;
+        }
+
+        switch (section) {
+        case Pending:
+            if (!line.isEmpty())
+                pendingItems.append(line);
+            break;
+        case Completed:
+            if (!line.isEmpty())
+                completedItems.append(line);
+            break;
+        default:
+            break;
+        }
+    }
+
+    file.close();
+
+    // Populate Pending list view
+    QStringListModel* pendingModel = qobject_cast<QStringListModel*>(toDoListWidget->m_pwPending->model());
+    if (pendingModel) {
+        pendingModel->setStringList(pendingItems);
+    }
+
+    // Populate Completed list view
+    QStringListModel* completedModel = qobject_cast<QStringListModel*>(toDoListWidget->m_pwCompleted->model());
+    if (completedModel) {
+        completedModel->setStringList(completedItems);
+    }
+}
