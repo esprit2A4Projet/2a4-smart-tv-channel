@@ -60,7 +60,7 @@ border-radius: 10px;
     </property>
     <widget class="QWidget" name="main">
      <attribute name="title">
-      <string>Tab 1</string>
+      <string>Accueil</string>
      </attribute>
      <widget class="QPushButton" name="pushButton_modifierS">
       <property name="geometry">
@@ -208,43 +208,6 @@ background : rgb(209, 208, 251);   color: #000000; /* Set the text color */
       </property>
       <property name="text">
        <string>Chercher</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_trierS">
-      <property name="geometry">
-       <rect>
-        <x>790</x>
-        <y>150</y>
-        <width>141</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Space Grotesk</family>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QLabel {
-    font-family: &quot;Space Grotesk&quot;;
-}
-/* Push Button Styling */
-QPushButton {
-    background-color: #E8E8FD; /* Set the background color for the push button */
-    border: 2px solid #D1D0FB; /* Set the border color */
-    border-radius: 10px; /* Adjust the radius for the rounded corners */
-    color: #000000; /* Set the text color */
-    font-family: &quot;Space Grotesk&quot;;
-
-}
-
-
-</string>
-      </property>
-      <property name="text">
-       <string>Filtrer</string>
       </property>
      </widget>
      <widget class="QWidget" name="widget" native="true">
@@ -907,6 +870,47 @@ QPushButton {
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
+      <widget class="QPushButton" name="pushButton_trierS">
+       <property name="geometry">
+        <rect>
+         <x>970</x>
+         <y>160</y>
+         <width>141</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Space Grotesk</family>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLabel {
+    font-family: &quot;Space Grotesk&quot;;
+}
+/* Push Button Styling */
+QPushButton {
+    background-color: #E8E8FD; /* Set the background color for the push button */
+    border: 2px solid #D1D0FB; /* Set the border color */
+    border-radius: 10px; /* Adjust the radius for the rounded corners */
+    color: #000000; /* Set the text color */
+    font-family: &quot;Space Grotesk&quot;;
+
+}
+
+QPushButton:hover
+{
+background : rgb(209, 208, 251);   color: #000000; /* Set the text color */
+}
+
+</string>
+       </property>
+       <property name="text">
+        <string>Filtrer par pack</string>
+       </property>
+      </widget>
      </widget>
      <zorder>frame_3</zorder>
      <zorder>pushButton_modifierS</zorder>
@@ -914,7 +918,6 @@ QPushButton {
      <zorder>lineEdit_rechercherS</zorder>
      <zorder>pushButton_supprimerS</zorder>
      <zorder>pushButton_rechercherS</zorder>
-     <zorder>pushButton_trierS</zorder>
      <zorder>widget</zorder>
      <zorder>PDF</zorder>
      <zorder>groupBox</zorder>
@@ -925,7 +928,7 @@ QPushButton {
     </widget>
     <widget class="QWidget" name="metier">
      <attribute name="title">
-      <string>Tab 2</string>
+      <string>SMS</string>
      </attribute>
      <widget class="QWidget" name="widget_5" native="true">
       <property name="geometry">
@@ -1089,7 +1092,7 @@ QPushButton {
     </widget>
     <widget class="QWidget" name="statistiques">
      <attribute name="title">
-      <string>Page</string>
+      <string>Statistiques</string>
      </attribute>
      <widget class="QWidget" name="widget_7" native="true">
       <property name="geometry">

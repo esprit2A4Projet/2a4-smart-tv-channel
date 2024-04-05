@@ -110,24 +110,35 @@ void MainWindow::validateNom(const QString &text)
     bool isValid = rx.exactMatch(text) && text.length() <= 20;
     ui->label_NomError->setVisible(!isValid);
     ui->label_NomError->setStyleSheet(isValid ? "" : "color: red;");
+    ui->lineEdit_nomS->setValidator(new QRegExpValidator(QRegExp("^[a-zA-Z _]+$"), this));
 }
 
 void MainWindow::validateBudget(const QString &text)
 {
+
     bool budgetConversionOk;
     double budgetValue = text.toDouble(&budgetConversionOk);
     bool isValid = budgetConversionOk && text.length() <= 20;
     // Add visibility and style setting for the budget error label
     ui->label_BudgetError->setVisible(!isValid);
     ui->label_BudgetError->setStyleSheet(isValid ? "" : "color: red;");
+    QRegExp regExp("\\d{1,20}"); // This regex allows for numbers with 1 to 20 digits
+    QRegExpValidator* budgetValidator = new QRegExpValidator(regExp, this);
+    ui->lineEdit_budget->setValidator(budgetValidator);
+
 
 }
 
 void MainWindow::validateTelephone(const QString &text)
 {
+
     bool isValid = text.length() == 8 && text.toInt(); // Check for 8 digits and numeric characters
     ui->label_TelError->setVisible(!isValid);
     ui->label_TelError->setStyleSheet(isValid ? "" : "color: red;");
+    QRegExp regExp("\\d{8}");
+    QRegExpValidator* telValidator = new QRegExpValidator(regExp, this);
+    ui->lineEdit_tel->setValidator(telValidator);
+
 
 }
 
@@ -177,6 +188,7 @@ void MainWindow::on_pushButton_ajouterS_clicked()
         {
             QMessageBox::critical(this, "Erreur", "Échec de la connexion à la base de données.");
         }
+        statistiquesS();
 }
 
 
@@ -245,6 +257,7 @@ void MainWindow::on_pushButton_supprimerS_clicked()
     } else {
         QMessageBox::warning(this, "Avertissement", "Veuillez sélectionner une ligne à supprimer.");
     }
+    statistiquesS();
 }
 
 void MainWindow::on_pushButton_modifierS_clicked()
@@ -288,6 +301,12 @@ void MainWindow::on_pushButton_modifierS_clicked()
             return;
         }
 
+        // Validation du pack
+        if (pack!="Bronze" && pack!="Silver" && pack!="Gold") {
+            QMessageBox::critical(this, "Erreur", "Le pack doit etre Bronze/Silver/Gold.");
+            return;
+        }
+
         // Validation de la date
         QDate startDate = QDate::fromString(date_deb, "dd/MM/yyyy");
         QDate endDate = QDate::fromString(date_fin, "dd/MM/yyyy");
@@ -324,6 +343,7 @@ void MainWindow::on_pushButton_modifierS_clicked()
     } else {
         QMessageBox::warning(this, "Avertissement", "Veuillez sélectionner une ligne à modifier.");
     }
+    statistiquesS();
 }
 
 
@@ -596,7 +616,7 @@ void MainWindow::onRemoveToDo() {
 }
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    saveToDoListToFile("todo_list.txt"); // Change the filename as needed
+    saveToDoListToFile("C:/Users/amine/OneDrive - ESPRIT/2A4/projetqt/Atelier_Connexion/Atelier_Connexion/todo_list.txt"); // Change the filename as needed
     event->accept();
 }
 
