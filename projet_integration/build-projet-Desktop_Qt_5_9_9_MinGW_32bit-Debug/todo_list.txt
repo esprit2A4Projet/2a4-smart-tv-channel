@@ -1,6 +1,0 @@
-Pending Items:
-integration
-
-Completed Items:
-sms
-face id
