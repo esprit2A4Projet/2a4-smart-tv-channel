@@ -109,7 +109,7 @@ void Invite::rechercherInvite(const QString &searchTerm, QTableWidget *tableWidg
     if (!c.createconnect()) return;
 
     QSqlQuery query(c.db);
-    query.prepare("SELECT * FROM INVITE WHERE NOM LIKE :searchTerm OR PRENOM LIKE :searchTerm");
+    query.prepare("SELECT * FROM INVITE WHERE NOM LIKE :searchTerm");
     query.bindValue(":searchTerm", "%" + searchTerm + "%");
 
     if (query.exec())
@@ -265,9 +265,6 @@ void Invite::afficherDatePodcastsCalendrier(QCalendarWidget *calendarWidget) {
                    QDate date = QDate::fromString(dateString, "dd/MM/yyyy"); // Convertir la chaîne en QDate
                    if (date.isValid()) {
                        calendarWidget->setDateTextFormat(date, format);
-                   } else {
-                       // Gestion de l'erreur si la conversion échoue
-                       qDebug() << "Erreur lors de la conversion de la date" << dateString;
                    }
                }
            } else {

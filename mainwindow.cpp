@@ -54,15 +54,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
    connect(ui->lineEdit_prenom, &QLineEdit::textChanged, this, &MainWindow::validatePrenom);
    connect(ui->lineEdit_profession, &QLineEdit::textChanged, this, &MainWindow::validateProfession);
    connect(ui->lineEdit_emailInvite, &QLineEdit::textChanged, this, &MainWindow::validateEmailInvite);
-   /****************CALENDRIER******************/
+   /****************FONCTIONNALITES******************/
    Invite i;
    i.afficherDatePodcastsCalendrier(ui->calendarWidget);
-
 
    ui->tableWidget->hideColumn(0); // Cette ligne masque la première colonne
    connect(ui->calendarWidget, SIGNAL(clicked(const QDate&)), this, SLOT(on_calendarWidget_clicked(const QDate&)));
 
-statistiquesNbAbonnes();
+   statistiquesNbAbonnes();
+   // Dans le constructeur ou l'initialisation de votre classe MainWindow
+   disconnect(ui->calendarWidget, SIGNAL(clicked(const QDate&)), this, SLOT(on_calendarWidget_clicked(const QDate&)));
+   connect(ui->calendarWidget, SIGNAL(clicked(const QDate&)), this, SLOT(on_calendarWidget_clicked(const QDate&)));
+
 
 
 }
@@ -291,11 +294,7 @@ void MainWindow::on_pushButton_trierInvite_clicked()
             showCustomMessageBox("Erreur", "Echec de tri de données", QMessageBox::Critical);
         }
     }
-    else
-    {
-        // Gérer le cas où aucune option de tri n'est sélectionnée
-        qDebug() << "Aucune option de tri sélectionnée.";
-    }
+
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -317,30 +316,49 @@ void MainWindow::on_pushButton_exporterInvite_clicked()
                "<head>\n"
                "<meta Content=\"Text/html; charset=Windows-1251\">\n"
                << QString("<title>%1</title>\n").arg("Liste des invites")
-               << "</head>\n"
-                  "<body bgcolor=#ffffff link=#5000A0>\n"
-                  "<center> <H1>Liste Des Invites </H1></br></br><table border=1 cellspacing=0 cellpadding=2>\n";
+               << "<style>"
+               "   body { font-family: 'Space Grotesk'; background-color: #ffffff; }"
+               "   table { border-collapse: collapse; width: 100%; }"
+               "   th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }"
+               "   th { background-color: #E8E8FD; }"
+               "</style>\n"
+               "</head>\n"
+               "<body>\n";
 
-        // headers
-        out << "<thead><tr bgcolor=#E8E8FD> <th>Numero</th>";
+        // Add logo and application name
+        out << "<div style=\"text-align: right;\"><img src=\"C:/Users/ibtis/OneDrive/Desktop/ESPRIT/initiation/logoo.png\" width=\"250\" height=\"100\"><br>"
+               "<h1 style=\"color: #E8E8FD; text-align: center;\">Application Insightify</h1></div>\n";
+        "<h2 style=\"color: #E8E8FD; text-align: center;\">Liste des invites</h1></div>\n";
+
+
+
+        // Add table
+        out << "<table>\n"
+               "<thead><tr> <th>Numéro</th>";
         for (int column = 0; column < columnCount; column++)
             out << QString("<th>%1</th>").arg(ui->tableWidget->horizontalHeaderItem(column)->text());
         out << "</tr></thead>\n";
 
-        // data table
+        // Add data rows
         for (int row = 0; row < rowCount; row++)
         {
-            out << "<tr> <td bkcolor=0>" << row + 1 << "</td>";
+            out << "<tr> <td>" << row + 1 << "</td>";
             for (int column = 0; column < columnCount; column++)
             {
                 QTableWidgetItem *item = ui->tableWidget->item(row, column);
-                QString data = (item) ? item->text().simplified() : QString("&nbsp;");
-                out << QString("<td bkcolor=0>%1</td>").arg((!data.isEmpty()) ? data : QString("&nbsp;"));
+                QString data = (item) ? item->text().simplified() : "&nbsp;";
+                out << QString("<td>%1</td>").arg((!data.isEmpty()) ? data : "&nbsp;");
             }
             out << "</tr>\n";
         }
-        out << "</table> </center>\n"
-               "</body>\n"
+        out << "</table>\n";
+
+        // Add copyright and team information
+        out << "<br><br><div style=\"text-align: center;\">"
+               " 2024 Insightify. All rights reserved.<br>"
+               "Developed by Insightify Team</div>\n";
+
+        out << "</body>\n"
                "</html>\n";
 
         QPrinter printer(QPrinter::PrinterResolution);
@@ -360,6 +378,8 @@ void MainWindow::on_pushButton_exporterInvite_clicked()
         showCustomMessageBox("Erreur", "Échec de l'exportation du tableau en PDF.", QMessageBox::Critical);
     }
 }
+
+
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -387,7 +407,7 @@ void MainWindow::updateTableWidget(const QString &filter)
        model->setQuery("SELECT * FROM INVITE");
    } else {
        // Si un filtre de recherche est spécifié, utiliser la requête filtrée
-       QString query = QString("SELECT * FROM INVITE WHERE Nom LIKE '%1%' OR Prenom LIKE '%1%' OR Profession LIKE '%1%' OR Email LIKE '%1%'").arg(filter);
+       QString query = QString("SELECT * FROM INVITE WHERE Nom LIKE '%1%'").arg(filter);
        model->setQuery(query);
    }
 
@@ -521,6 +541,9 @@ void MainWindow::validateProfession(const QString &text) {
 }
 
 /*---------------------------------------------------------------------------CALENDRIER-----------------------------------------------------------------------------------------------------*/
+/*******************************************************************************************************************************************************************************************/
+
+/*--------Rafraichir le calendrier-------------*/
 void MainWindow::on_pushButton_rafraichir_clicked()
 {
     Invite i;
@@ -529,18 +552,28 @@ void MainWindow::on_pushButton_rafraichir_clicked()
     // Effacer le contenu du lineEdit de l'email
     ui->lineEdit_emailInvite->clear();
     ui->calendarWidget->setMinimumDate(QDate(1900, 1, 1));
-       ui->calendarWidget->setMaximumDate(QDate(3000, 1, 1));
+    ui->calendarWidget->setMaximumDate(QDate(3000, 1, 1));
 
        // Sélectionner une date qui ne sera jamais utilisée
-       ui->calendarWidget->setSelectedDate(QDate(2000, 1, 1));
+       ui->calendarWidget->setSelectedDate(QDate(2024, 1, 1));
 
 }
-/*--------------------------------------------------------EMAIL-------------------------------------------------------*/
+/*--------Verifier si le calendrier est selectionné-------------*/
+void MainWindow::on_calendarWidget_clicked()
+{
+     dateSelected = true;
+
+}
+
+/*---------------------------------------------------------------------------EMAIL-----------------------------------------------------------------------------------------------------*/
+/*******************************************************************************************************************************************************************************************/
+
+/*--------Verifier si l'email existe dans la bdd-------------*/
 bool emailExists(const QString &email)
 {
     Connection c;
-    if (!c.createconnect()) {
-        qDebug() << "Failed to connect to database.";
+    if (!c.createconnect())
+    {
         return false;
     }
 
@@ -548,25 +581,31 @@ bool emailExists(const QString &email)
     query.prepare("SELECT COUNT(*) FROM INVITE WHERE Email = ?");
     query.addBindValue(email);
 
-    if (!query.exec()) {
-        qDebug() << "Failed to execute query:" << query.lastError().text();
+    if (!query.exec())
+    {
+
         return false;
     }
 
-    if (query.next()) {
+    if (query.next())
+    {
         int count = query.value(0).toInt();
-        if (count > 0) {
-            qDebug() << "Email exists in database.";
+        if (count > 0)
+        {
             return true;
-        } else {
-            qDebug() << "Email does not exist in database.";
+        }
+        else
+        {
             return false;
         }
-    } else {
-        qDebug() << "Query returned no result.";
+    }
+    else
+    {
         return false;
     }
 }
+/*-------------Envoyer l'Email----------------*/
+
 void MainWindow::on_pushButton_envoyer_clicked()
 {
     QString emailAddress = ui->lineEdit_emailInvite->text();
@@ -598,7 +637,7 @@ void MainWindow::on_pushButton_envoyer_clicked()
                 QString subject = "Invitation au podcast \"" + podcastName + "\" du " + dateString;
 
                 // Construct the email message content
-                QString messageContent = "Bonjour,\n\nVous êtes cordialement invité au podcast \"" + podcastName + "\" du " + dateString + ".\n\nCordialement,\nVotre Nom";
+                QString messageContent = "Bonjour,\n\nVous êtes cordialement invité au podcast \"" + podcastName + "\" du " + dateString + ".\n\nCordialement,\nInsightify Team";
 
                 // Attempt to send the email
                 if (smtp->sendMail("ibtissembenamara14@gmail.com", emailAddress, subject, messageContent))
@@ -607,30 +646,31 @@ void MainWindow::on_pushButton_envoyer_clicked()
                 }
                 else
                 {
-                    qDebug() << "Failed to send email!";
+
                     QMessageBox::critical(this, "Erreur", "Échec de l'envoi de l'email.");
                 }
 
             }
             else
             {
-                qDebug() << "Invalid podcast date!";
+
                 QMessageBox::warning(this, "Date invalide", "La date sélectionnée n'est pas une date de podcast valide.");
             }
         }
         else
         {
-            qDebug() << "L'e-mail n'existe pas dans la base de données. Impossible d'envoyer l'e-mail.";
+
             QMessageBox::critical(this, "Erreur", "L'e-mail n'existe pas dans la base de données. Impossible d'envoyer l'e-mail.");
         }
     }
     else
     {
-        qDebug() << "Email address or date is empty!";
+
         QMessageBox::warning(this, "Champs vides", "Veuillez saisir une adresse e-mail et sélectionner une date avant d'envoyer l'e-mail.");
     }
 }
 
+/*--------Verifier si la date selectionnée est une date de podcast-------------*/
 
 bool MainWindow::isPodcastDate(const QDate &date)
 {
@@ -640,7 +680,7 @@ bool MainWindow::isPodcastDate(const QDate &date)
     QSqlQuery query(c.db);
 
     if (!query.exec("SELECT DATE_POD FROM PODCASTS")) {
-        qDebug() << "Query error: " << query.lastError().text();
+
         c.db.close();
         return false;
     }
@@ -653,44 +693,46 @@ bool MainWindow::isPodcastDate(const QDate &date)
         if (podcastDate.isValid()) {
             podcastDates.append(podcastDate);
         } else {
-            qDebug() << "Invalid date format in database: " << dateString;
+
         }
     }
 
     return podcastDates.contains(date);
 }
 
+/*--------obtenir le nom du podcast suivant la date-------------*/
 
-QString MainWindow::getPodcastNameByDate(const QDate &date) {
+QString MainWindow::getPodcastNameByDate(const QDate &date)
+{
     Connection c;
-    if (!c.createconnect()) {
-        qDebug() << "Failed to connect to the database.";
+    if (!c.createconnect())
+    {
+
         return QString();
     }
 
     QSqlQuery query(c.db);
 
-    // Prepare the SQL query to select the podcast name based on the given date
-    query.prepare("SELECT p.NOM FROM PODCASTS p INNER JOIN PARTICIPER pt ON p.ID_PODCAST = pt.ID_PODCAST "
-                  "WHERE TO_CHAR(TO_DATE(p.DATE_POD, 'DD/MM/YYYY'), 'DD/MM/YYYY') = :date");
+    query.prepare("SELECT NOM FROM PODCASTS WHERE TO_CHAR(TO_DATE(DATE_POD, 'DD/MM/YYYY'), 'DD/MM/YYYY') = :date");
 
-    // Bind the date parameter to the query
     query.bindValue(":date", date.toString("dd/MM/yyyy"));
 
-    // Execute the query
-    if (!query.exec()) {
-        qDebug() << "Failed to execute query:" << query.lastError().text();
+    if (!query.exec())
+    {
+
         c.db.close();
         return QString();
     }
 
-    // Fetch the podcast name if the query returned a result
-    if (query.next()) {
+    if (query.next())
+    {
         QString podcastName = query.value(0).toString();
         c.db.close();
         return podcastName;
-    } else {
-        qDebug() << "No podcast found for the given date:" << date.toString("dd/MM/yyyy");
+    }
+    else
+    {
+
         c.db.close();
         return QString();
     }
@@ -698,20 +740,16 @@ QString MainWindow::getPodcastNameByDate(const QDate &date) {
 
 
 
-
-void MainWindow::on_calendarWidget_clicked()
-{
-     dateSelected = true;
-
-}
-
+/*--------le status de l'email-------------*/
 void MainWindow::mailStatus(const QString &status)
 {
     qDebug() << "Mail status:" << status;
 }
 
 
-/*---------------------------------------------------STATISTIQUES-----------------------------------------------*/
+/*-----------------------------------------------------------------STATISTIQUES------------------------------------------------------------------------*/
+/*******************************************************************************************************************************************************************************************/
+
 void MainWindow::statistiquesNbAbonnes()
 {
     Connection C;
@@ -750,10 +788,7 @@ void MainWindow::statistiquesNbAbonnes()
         QString c = QString("10k-100kk: %1%").arg(percent10000_100000, 0, 'f', 2);
         QString d = QString("100k+: %1%").arg(percent100000_plus, 0, 'f', 2);
 
-        qDebug() << "0-1k:" << percent0_1000 << "%";
-        qDebug() << "1k-10k:" << percent1000_10000 << "%";
-        qDebug() << "10k-100k:" << percent10000_100000 << "%";
-        qDebug() << "100k+:" << percent100000_plus << "%";
+
 
 
     QPieSeries *series = new QPieSeries();
@@ -811,11 +846,14 @@ void MainWindow::statistiquesNbAbonnes()
     ui->statS->setLayout(layout);
 }
 
+/*-----------------Actualiser le piechart--------------------*/
 
 void MainWindow::on_pushButton_actualiser_clicked()
 {
     statistiquesNbAbonnes();
 }
+
+/*-----------------Imprimer le piechart--------------------*/
 
 void MainWindow::on_pushButton_imprimer_clicked()
 {
@@ -852,3 +890,57 @@ void MainWindow::on_pushButton_imprimer_clicked()
     ui->statS->render(&painter, QPoint(), QRegion(), QWidget::DrawChildren);
 }
 
+// Connectez le signal clicked de votre QCalendarWidget à ce slot
+void MainWindow::on_calendarWidget_clicked(const QDate &date)
+{
+    // Récupérez les informations du podcast pour la date sélectionnée
+    QString podcastInfo = getPodcastInfoByDate(date);
+
+    // Vérifiez si des informations ont été trouvées
+    if (!podcastInfo.isEmpty()) {
+        // Créez une fenêtre de dialogue pour afficher les informations du podcast
+        QMessageBox::information(this, "Informations du podcast", podcastInfo);
+    } else {
+        // Si aucune information n'a été trouvée, affichez un message d'erreur
+        QMessageBox::warning(this, "Aucun podcast trouvé", "Aucun podcast n'est prévu pour la date sélectionnée.");
+    }
+}
+
+// Méthode pour récupérer les informations du podcast à partir de la base de données
+QString MainWindow::getPodcastInfoByDate(const QDate &date)
+{
+    Connection c;
+    if (!c.createconnect()) {
+        return QString();
+    }
+
+    QSqlQuery query(c.db);
+    query.prepare("SELECT NOM, DUREE, LIEU, CATEGORIE FROM PODCASTS WHERE DATE_POD = :date");
+    query.bindValue(":date", date.toString("dd/MM/yyyy"));
+
+    if (!query.exec()) {
+        c.db.close();
+        return QString();
+    }
+
+    if (query.next()) {
+        QString podcastName = query.value(0).toString();
+        QString podcastDuration = query.value(1).toString();
+        QString podcastLocation = query.value(2).toString();
+        QString podcastCategory = query.value(3).toString();
+
+        // Construisez une chaîne de texte avec les informations récupérées
+        QString podcastInfo = "Nom : " + podcastName + "\n"
+                            + "Durée : " + podcastDuration + "\n"
+                            + "Lieu : " + podcastLocation + "\n"
+                            + "Catégorie : " + podcastCategory;
+
+        c.db.close();
+        return podcastInfo;
+    } else {
+        c.db.close();
+        return QString();
+    }
+}
+
+/*-------------------------------------------------------------------------------------------------------FIN----------------------------------------------------------------------------------------------*/

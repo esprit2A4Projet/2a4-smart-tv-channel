@@ -264,7 +264,7 @@ border-radius: 10px; /* Adjust the radius for the rounded corners */
 </string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -1312,9 +1312,9 @@ QPushButton {
      <widget class="QFrame" name="statS">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>490</x>
         <y>160</y>
-        <width>441</width>
+        <width>481</width>
         <height>322</height>
        </rect>
       </property>

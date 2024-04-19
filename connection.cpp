@@ -38,7 +38,7 @@ bool Connection::insertData(const QString &nom, const QString &prenom, const QSt
         return true;
     } else {
         // Insertion failed, print error details
-        qDebug() << "Error: " << query.lastError().text();
+
         return false;
     }
 }

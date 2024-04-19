@@ -48,6 +48,8 @@ private slots:
     void on_pushButton_imprimer_clicked();
     QString getPodcastNameByDate(const QDate &date);
     //bool emailExists(const QString &email);
+    void on_calendarWidget_clicked(const QDate &date);
+    QString getPodcastInfoByDate(const QDate &date);
 
 
 
