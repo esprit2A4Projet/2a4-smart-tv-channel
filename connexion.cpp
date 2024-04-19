@@ -20,13 +20,12 @@ test=true;
 }
 bool Connection::insertData(const QString &modeDePaiement, const QString &type, const QString &categorie, const QString &dateTransaction, const QString &montant)
 {
-    QSqlQuery query;
-    query.prepare("INSERT INTO TRANSACTIONS (MODEDEPAIEMENT, TYPE, CATEGORIE, DATETRANSACTION, MONTANT) VALUES (:modeDePaiement, :type, :categorie, :dateTransaction, :montant)");
+        QSqlQuery query;
+        query.prepare("INSERT INTO TRANSACTIONS (MODEDEPAIEMENT, TYPE, CATEGORIE, DATETRANSACTION, MONTANT) VALUES (:modeDePaiement, :type, :categorie, :dateTransaction, :montant)");
         query.bindValue(":modeDePaiement", modeDePaiement);
         query.bindValue(":type", type);
         query.bindValue(":categorie", categorie);
         query.bindValue(":dateTransaction", dateTransaction);
         query.bindValue(":montant", montant);
-
-    return query.exec();
+        return query.exec();
 }

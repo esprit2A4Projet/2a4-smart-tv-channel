@@ -4,20 +4,13 @@ QT       += core gui sql \
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
+QT += charts
+QT += printsupport
+include("C:/Users/user/Desktop/ESPRIT/2A4/2eme periode/projet/Module_Finance/xlsx/qtxlsx.pri")
 
-# Remplacez le chemin d'accès à la bibliothèque QtAV
-QTAV_PATH = C:/Users/user/Desktop/QTAV
 
-# Ajoutez les répertoires d'inclusion et de bibliothèques de QtAV
-INCLUDEPATH += $$QTAV_PATH/include
-LIBS += -L$$QTAV_PATH/lib
 
-# Ajoutez les bibliothèques spécifiques de QtAV dont votre application a besoin
-LIBS += -LC:/Users/user/Desktop/QTAV/lib
 
-# Ajoutez les bibliothèques spécifiques de QtAVWidgets
-LIBS += -lQtAVWidgets1
-LIBS += -lQtAV1
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings

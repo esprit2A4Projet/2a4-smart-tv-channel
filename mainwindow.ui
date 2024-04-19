@@ -572,17 +572,27 @@ QPushButton:hover {
        </item>
        <item>
         <property name="text">
-         <string>location local</string>
+         <string>Location local</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>vente materiel</string>
+         <string>Vente materiel</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>achat materiel</string>
+         <string>Achat materiel</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Autres depenses</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Autres revenues</string>
         </property>
        </item>
       </widget>
@@ -605,22 +615,6 @@ QPushButton:hover {
         <string/>
        </property>
       </widget>
-     </widget>
-     <widget class="QLabel" name="label_illustration">
-      <property name="geometry">
-       <rect>
-        <x>260</x>
-        <y>0</y>
-        <width>541</width>
-        <height>161</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../../../../../Downloads/Group 266.png</pixmap>
-      </property>
      </widget>
      <widget class="QPushButton" name="pushButton_exportationFormatExcel_Transaction">
       <property name="geometry">
@@ -969,43 +963,10 @@ QPushButton:hover {
        <string/>
       </property>
      </widget>
-     <widget class="QListView" name="listView">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>60</y>
-        <width>751</width>
-        <height>91</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QListView {
-    border: 1px solid #646464; /* Contour ajusté pour mieux s'accorder avec le fond sombre */
-    background-color: #333333; /* Fond sombre */
-    show-decoration-selected: 1; /* Pour montrer une décoration lors de la sélection */
-}
-
-QListView::item {
-    border-bottom: 1px solid #555555; /* Ligne de séparation entre les éléments, légèrement plus claire que le fond */
-    padding: 5px; /* Espacement interne pour chaque élément */
-    color: #FFFFFF; /* Texte en blanc pour contraster avec le fond sombre */
-}
-
-QListView::item:selected {
-    background-color: #555555; /* Couleur de fond pour un élément sélectionné, légèrement plus claire */
-    color: #FFFFFF; /* Conserver le texte en blanc pour un élément sélectionné */
-}
-
-QListView::item:hover {
-    background-color: #474747; /* Couleur de fond au survol, un peu plus claire que le fond général */
-    color: #FFFFFF; /* Texte en blanc au survol */
-}</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton">
       <property name="geometry">
        <rect>
-        <x>890</x>
+        <x>920</x>
         <y>20</y>
         <width>51</width>
         <height>41</height>
@@ -1033,7 +994,7 @@ QPushButton#pushButton:hover {
      <widget class="QLabel" name="label_11">
       <property name="geometry">
        <rect>
-        <x>840</x>
+        <x>870</x>
         <y>20</y>
         <width>61</width>
         <height>41</height>
@@ -1046,8 +1007,20 @@ QPushButton#pushButton:hover {
        <pixmap>../../../../../../Downloads/logo 1.png</pixmap>
       </property>
      </widget>
+     <widget class="QPushButton" name="faceIDButton">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>200</y>
+        <width>171</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>FACE ID</string>
+      </property>
+     </widget>
      <zorder>groupBox_AjoutTransaction</zorder>
-     <zorder>label_illustration</zorder>
      <zorder>pushButton_exportationFormatExcel_Transaction</zorder>
      <zorder>line</zorder>
      <zorder>lineEdit_RechercheParMONTANT_Transaction</zorder>
@@ -1056,81 +1029,33 @@ QPushButton#pushButton:hover {
      <zorder>pushButton_Modification_Transaction</zorder>
      <zorder>pushButton_Suppression_Transaction</zorder>
      <zorder>Button_TrierParMontant_Transaction</zorder>
-     <zorder>titre_lineEdit_rechercheParMontant_Transaction</zorder>
      <zorder>champ_erreur_rechercheParMontant</zorder>
      <zorder>label_9</zorder>
      <zorder>label_8</zorder>
      <zorder>champ_resultat_CRUD_Transaction</zorder>
      <zorder>pushButton</zorder>
      <zorder>label_11</zorder>
-     <zorder>listView</zorder>
+     <zorder>titre_lineEdit_rechercheParMontant_Transaction</zorder>
+     <zorder>faceIDButton</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
       <string>Statistiques</string>
      </attribute>
-     <widget class="QLabel" name="label_2">
+     <widget class="QFrame" name="statsTransactions">
       <property name="geometry">
        <rect>
-        <x>-260</x>
-        <y>170</y>
-        <width>901</width>
-        <height>421</height>
+        <x>0</x>
+        <y>150</y>
+        <width>961</width>
+        <height>451</height>
        </rect>
       </property>
-      <property name="text">
-       <string/>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
       </property>
-      <property name="pixmap">
-       <pixmap>../../../../../../Downloads/Group 193.png</pixmap>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>70</x>
-        <y>180</y>
-        <width>271</width>
-        <height>391</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../../../../../Downloads/courbe.png</pixmap>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>20</y>
-        <width>941</width>
-        <height>131</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../../../../../Downloads/insightify interface stats.png</pixmap>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>170</y>
-        <width>901</width>
-        <height>421</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../../../../../Downloads/Group 193.png</pixmap>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
       </property>
      </widget>
     </widget>

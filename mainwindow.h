@@ -4,8 +4,8 @@
 #include <QMainWindow>
 #include <QSqlQueryModel>
 #include <QComboBox>
+#include <QtCharts/QChart>
 #include "transaction.h"
-#include "notification.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,12 +18,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+
+
     //MISE A JOUR DE LA TABLE
     void update_table_de_transactions();
 
-    //NOTIFICATIONS
-    void afficherListeNotifications();
-    void setupListView();
 
 private slots:
 
@@ -48,17 +48,22 @@ private slots:
     void showChoicesUnderCell_Transactions(int row, int column, const QStringList &choices);
     void handleCellClicked_Transactions(int row, int column);
     void editMontantCell_Transactions(int row, int column);
+    void updateCategoryOptions();
 
+    //NOTIFICATIONS
+    void envoyerNotificationTransaction(QString a, QString b);
+    void envoyerNofiticatiionDepassementRevenuesEtDepenses();
 
+    //STATS
+    void AfficherEtmettreAJourPieChartTransaction();
 
+    void on_faceIDButton_clicked();
 
 signals:
     void signal_table_de_transaction_mise_a_jour(); // Declare the dataUpdated signal
 private:
     Ui::MainWindow *ui;
-    Transaction Etmp;
     QSqlQueryModel *model; // Declare a member variable for the model
-    SortedStringListModel *listeNotifications_Transactions;
 };
 
 #endif // MAINWINDOW_H

@@ -4,6 +4,7 @@
 #include <QSqlQuery>
 #include <QSqlQueryModel>
 #include <QTableWidget>
+#include "mainwindow.h"
 
 class Transaction
 {
@@ -40,7 +41,8 @@ public:
     bool supprimerTransaction(int);
     bool modifierTransaction(int id, const QString &modeDePaiement, const QString &type, const QString &categorie, const QString &dateTransaction, const QString &montant);
 
-
+    //NOTIFICATIONS
+    void envoyerNotificationTransaction(QString, QString);
 
 private:
 

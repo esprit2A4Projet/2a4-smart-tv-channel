@@ -2,8 +2,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include "connexion.h"
-#include <QListView>
-
+#include <QSystemTrayIcon>
 
 
 
