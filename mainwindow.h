@@ -162,6 +162,9 @@ void updateTableWidgetM();
 
     void on_EnregistrerQRCode_clicked();
 
+    void on_pushButtonDisplaySalaryChart_clicked();
+    void statistiquesEmploye();
+
 signals:
      void employeeAdded();
     void dataUpdated(); // Declare the dataUpdated signal

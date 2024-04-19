@@ -60,25 +60,6 @@ QString Employee::get_poste(){return poste;}
 int Employee::get_cin(){return cin;}
 QString Employee::get_email(){return email;}
 
-/*
-QPixmap Employee::generateQRCode() const {
-    // Créer une instance de QZXing
-    QZXing qzxing;
-
-    // Générer le contenu du code QR à partir des informations de l'employé
-    QString content = "Nom: " + nom + "\nPrénom: " + prenom + "\nPoste: " + poste +
-                      "\nDate d'embauche: " + date_embauche + "\nSalaire: " + QString::number(salaire) +
-                      "\nEmail: " + email + "\nCIN: " + cin;
-
-    // Convertir le contenu en code QR sous forme de QImage
-    QImage qrImage = qzxing.encodeData(content);
-
-    // Convertir l'image QR en QPixmap pour une utilisation plus facile dans l'interface utilisateur
-    QPixmap qrPixmap = QPixmap::fromImage(qrImage);
-
-    return qrPixmap;
-}
-*/
 
 bool Employee::ajouter(QString pos)
 {
@@ -103,7 +84,7 @@ bool Employee::ajouter(QString pos)
                     motDePasse = "sponsoring";
                 } else if (pos == "tresorier") {
                     motDePasse = "tresorier";
-                } else if (pos == "C.Invités") {
+                } else if (pos == "C.Invites") {
                     motDePasse = "invite";
                 } else if (pos =="R.logistique ")
                 {
@@ -142,6 +123,7 @@ bool Employee::supprimer(int id)
        QSqlQuery query;
        query.prepare("Delete from EMPLOYES where cin=:id");
        query.bindValue(0, id);
+
        return query.exec();
 
 }
@@ -238,7 +220,7 @@ QSqlQueryModel* Employee::tri()
    model->setHeaderData(3,Qt::Horizontal,QObject::tr("date d'embauche"));
    model->setHeaderData(4,Qt::Horizontal,QObject::tr("salaire"));
    model->setHeaderData(5,Qt::Horizontal,QObject::tr("poste"));
-   model->setHeaderData(5,Qt::Horizontal,QObject::tr("cin"));
+   model->setHeaderData(6,Qt::Horizontal,QObject::tr("cin"));
 
 
    return  model;
@@ -288,234 +270,6 @@ void Employee::genererPDFact()
 
 
 }
-
-
-
-// ... (other Employee class members)
-
-// Signal emitted when employee data changes
-/*void Employee::dataChanged() {
-  emit employeeDataChanged(); // Emit signal
-}*/
-
-// ... (implementation of stat())
-
-/*
-QChartView * Employee ::stat()
-{
-    int row_count = 0;
-            int row_count1 = 0;
-
-                    QSqlQuery query,query1;
-
-                    query.prepare("SELECT * FROM employes where SALAIRE>=2000");
-                    query.exec();
-                    while(query.next())
-                        row_count++;
-
-                    query1.prepare("SELECT * FROM employes where SALAIRE<2000");
-                    query1.exec();
-                    while(query1.next())
-                        row_count1++;
-
-            QPieSeries *series = new QPieSeries();
-            series->append("Des Employes ayant un salaire>=2000 dt", row_count);
-            series->append("Des Employes ayant un salaire<2000 dt", row_count1);
-
-            //pour slider les employes ayant un salaire>=2000dt
-            QPieSlice *slice= series->slices().at(0);
-            slice->setExploded(true);
-            slice->setLabelVisible(true);
-            slice->setPen((QPen(Qt::white)));
-
-            QChart *chart = new QChart();
-            chart->addSeries(series);
-            chart->setTitle("STATISTIQUE DES SALAIRES");
-            chart->legend()->setAlignment(Qt::AlignRight);
-            chart->legend()->setBackgroundVisible(true);
-            chart->legend()->setBrush(QBrush(QColor(128, 128, 128, 128)));
-            chart->legend()->setPen(QPen(QColor(192, 192, 192, 192)));
-            series->setLabelsVisible();
-
-            QChartView *chartView = new QChartView(chart);
-            chartView->setRenderHint(QPainter::Antialiasing);
-            return chartView;
-
-}
-
-
-*/
-
-
-
-QChartView *Employee::stat()
-{
-    int a1 = 0; // Number of employees with salary < 1000
-    int a2 = 0; // Number of employees with salary between 1000 and 1500
-    int a3 = 0; // Number of employees with salary between 1500 and 2000
-    int a4 = 0; // Number of employees with salary >= 2000
-
-    QSqlQuery query;
-
-    query.prepare("SELECT * FROM employes WHERE SALAIRE < 1000");
-    query.exec();
-    while (query.next())
-        a1++;
-
-    query.prepare("SELECT * FROM employes WHERE SALAIRE >= 1000 AND SALAIRE < 1500");
-    query.exec();
-    while (query.next())
-        a2++;
-
-    query.prepare("SELECT * FROM employes WHERE SALAIRE >= 1500 AND SALAIRE < 2000");
-    query.exec();
-    while (query.next())
-        a3++;
-
-    query.prepare("SELECT * FROM employes WHERE SALAIRE >= 2000");
-    query.exec();
-    while (query.next())
-        a4++;
-
-    qDebug() << a1 << a2 << a3 << a4;
-
-    QPieSeries *series = new QPieSeries();
-    series->append("Salaire &lt; 1000", a1);
-    series->append("Salaire 1000-1499", a2);
-    series->append("Salaire 1500-1999", a3);
-    series->append("Salaire >= 2000", a4);
-
-    QPieSlice *slice1 = series->slices().at(0);
-    slice1->setExploded(true);
-    slice1->setColor("#CCCCCC");
-
-    QPieSlice *slice2 = series->slices().at(1);
-    slice2->setColor("#4682B4");
-
-    QPieSlice *slice3 = series->slices().at(2);
-    slice3->setColor("#D1D0FB");
-
-    QPieSlice *slice4 = series->slices().at(3);
-    slice4->setColor("#041041");
-
-    QChart *chart = new QChart();
-    chart->addSeries(series);
-    chart->setTitle("Statistique des salaires des employés");
-
-    series->setLabelsVisible();
-
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->chart()->setAnimationOptions(QChart::AllAnimations);
-    chartView->chart()->legend()->hide();
-    chartView->resize(1000, 500);
-
-    return chartView;
-}
-
-/*
-QChartView *Employee::stat() {
-
-    // Initialize the pie series
-       QPieSeries *series = new QPieSeries();
-
-       // Open the database connection
-       QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-       db.setDatabaseName("your_database_name.sqlite");  // Replace with your database name
-       if (!db.open()) {
-           qDebug() << "Error: Couldn't open the database";
-           return nullptr;  // Return nullptr on database error
-       }
-       // Perform SQL query to get employee data
-          QSqlQuery query;
-          query.prepare("SELECT SALAIRE FROM employes");
-          if (!query.exec()) {
-              qDebug() << "Error executing query:" << query.lastError().text();
-              db.close();
-              return nullptr;  // Return nullptr on query execution error
-          }
-          // Create variables to store the count of employees in each salary range
-             int salaryLessThan1000 = 0;
-             int salary1000To1499 = 0;
-             int salary1500To1999 = 0;
-             int salary2000AndAbove = 0;
-
-             // Loop through query results and count employees in each salary range
-                while (query.next()) {
-                    int salary = query.value(0).toInt();
-                    if (salary < 1000) {
-                        salaryLessThan1000++;
-                    } else if (salary < 1500) {
-                        salary1000To1499++;
-                    } else if (salary < 2000) {
-                        salary1500To1999++;
-                    } else {
-                        salary2000AndAbove++;
-                    }
-                }
-                // Add salary ranges and employee counts to the pie series
-                   series->append("Salary < 1000", salaryLessThan1000);
-                   series->append("Salary 1000-1499", salary1000To1499);
-                   series->append("Salary 1500-1999", salary1500To1999);
-                   series->append("Salary >= 2000", salary2000AndAbove);
-
-                   // Create the chart
-                   QChart *chart = new QChart();
-                   chart->addSeries(series);
-                   chart->setTitle("Employee Salary Statistics");
-
-                   // Create the chart view and return it
-                   QChartView *chartView = new QChartView(chart);
-                   chartView->setRenderHint(QPainter::Antialiasing);
-
-                   // Close the database connection
-                   db.close();
-
-                   return chartView;
-
-
-}
-*/
-/*
-bool Employee::isCinUnique(int cin) {
-    QSqlQuery query;
-    query.prepare("SELECT COUNT(*) FROM employees WHERE cin = :cin");
-    query.bindValue(":cin", cin);
-
-    if (query.exec() && query.first()) {
-        int count = query.value(0).toInt();
-        qDebug() << "Count for CIN:" << cin << "is" << count;
-        return (count == 0);  // True if count is 0 (CIN is unique), false otherwise
-    } else {
-        qDebug() << "Error executing query for CIN:" << cin << "Error:" << query.lastError().text();
-        return false;  // Return false in case of query execution error
-    }
-}
-
-
-
-bool Employee::verifierCIN(int cin) {
-      // Connect to the database (assuming connection is established elsewhere)
-      QSqlDatabase db = QSqlDatabase::database();
-
-      // Prepare a query to check for existing CIN
-      QSqlQuery query(db);
-      query.prepare("SELECT COUNT(*) FROM employees WHERE cin = :cin");
-      query.bindValue(":cin", cin);
-
-      // Execute the query and check for results
-      if (!query.exec()) {
-          // Handle database error (optional)
-          qWarning() << "Error checking CIN in database:" << query.lastError().text();
-          return false; // Or throw an exception if preferred
-      }
-
-      query.next();
-      int count = query.value(0).toInt();
-
-      return count > 0; // Return true if CIN exists, false otherwise
-  }
-*/
 
 
 

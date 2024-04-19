@@ -45,8 +45,8 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>-3</x>
-      <y>0</y>
+      <x>10</x>
+      <y>10</y>
       <width>1221</width>
       <height>571</height>
      </rect>
@@ -90,7 +90,7 @@ QTabBar::tab:!selected {
      <enum>QTabWidget::West</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_18">
      <attribute name="title">
@@ -104,10 +104,10 @@ QTabBar::tab:!selected {
      <widget class="QTabWidget" name="tabWidget_10">
       <property name="geometry">
        <rect>
-        <x>-10</x>
-        <y>0</y>
-        <width>1101</width>
-        <height>561</height>
+        <x>10</x>
+        <y>20</y>
+        <width>1081</width>
+        <height>541</height>
        </rect>
       </property>
       <property name="font">
@@ -146,7 +146,7 @@ border-radius: 10px;
 }</string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_24">
        <attribute name="title">
@@ -1016,121 +1016,23 @@ background : rgb(209, 208, 251);   color: #000000; /* Set the text color */
          <string/>
         </property>
        </widget>
-       <widget class="QWidget" name="horizontalLayoutWidget">
+       <widget class="QFrame" name="horizontalFrame">
         <property name="geometry">
          <rect>
-          <x>60</x>
-          <y>210</y>
-          <width>481</width>
-          <height>291</height>
+          <x>50</x>
+          <y>170</y>
+          <width>581</width>
+          <height>331</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalFrame"/>
        </widget>
-       <widget class="QPushButton" name="pushButtonDisplaySalaryChart">
-        <property name="geometry">
-         <rect>
-          <x>230</x>
-          <y>160</y>
-          <width>141</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Space Grotesk</family>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-    font-family: &quot;Space Grotesk&quot;;
-}
-/* Push Button Styling */
-QPushButton {
-    background-color: #E8E8FD; /* Set the background color for the push button */
-    border: 2px solid #D1D0FB; /* Set the border color */
-  /*  border-radius: 10px; Adjust the radius for the rounded corners */
-    color: #000000; /* Set the text color */
-    font-family: &quot;Space Grotesk&quot;;
-
-}
-
-QPushButton:hover
-{
-background : rgb(209, 208, 251);   color: #000000; /* Set the text color */
-}
-
-</string>
-        </property>
-        <property name="text">
-         <string>Statistiques</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_12">
-        <property name="geometry">
-         <rect>
-          <x>160</x>
-          <y>140</y>
-          <width>51</width>
-          <height>61</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="stat.qrc">:/new/prefix1/stat-removebg-preview (1).png</pixmap>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButtonClearStatistics">
-        <property name="geometry">
-         <rect>
-          <x>370</x>
-          <y>160</y>
-          <width>21</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Space Grotesk</family>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-    font-family: &quot;Space Grotesk&quot;;
-}
-/* Push Button Styling */
-QPushButton {
-    background-color: #E8E8FD; /* Set the background color for the push button */
-    border: 2px solid #D1D0FB; /* Set the border color */
-/*    border-radius: 10px;  Adjust the radius for the rounded corners */
-    color: #000000; /* Set the text color */
-    font-family: &quot;Space Grotesk&quot;;
-
-}
-
-QPushButton:hover
-{
-background : rgb(209, 208, 251);   color: #000000; /* Set the text color */
-}
-
-</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
        <widget class="QPushButton" name="pushButton">
         <property name="geometry">
          <rect>
-          <x>640</x>
+          <x>670</x>
           <y>160</y>
-          <width>181</width>
+          <width>151</width>
           <height>31</height>
          </rect>
         </property>
@@ -1219,9 +1121,9 @@ background : rgb(209, 208, 251);   color: #000000; /* Set the text color */
        <widget class="QPushButton" name="EnregistrerQRCode">
         <property name="geometry">
          <rect>
-          <x>640</x>
+          <x>680</x>
           <y>440</y>
-          <width>201</width>
+          <width>191</width>
           <height>28</height>
          </rect>
         </property>
@@ -5969,10 +5871,9 @@ color: white;</string>
  </widget>
  <resources>
   <include location="az.qrc"/>
-  <include location="stat.qrc"/>
-  <include location="cap.qrc"/>
-  <include location="captures.qrc"/>
   <include location="tri.qrc"/>
+  <include location="captures.qrc"/>
+  <include location="cap.qrc"/>
  </resources>
  <connections/>
 </ui>

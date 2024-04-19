@@ -65,38 +65,3 @@ int Login::validateLogin(int enteredUsercin, QString enteredPassword) {
         return -1;
     }
 }
-
-/*
-int Login::validateLogin(int enteredUsercin, QString enteredPassword) {
-    // Vérifiez les informations de connexion et renvoyez vrai si elles sont correctes
-
-    if ( enteredPassword == "rh2023")
-    {
-        return 1;
-    } else if ( enteredPassword == "invite" )
-    {
-        return 2;
-    } else if ( enteredPassword == "materiel" )
-    {
-        return 3;
-    }
-    else if ( enteredPassword == "podcast" )
-    {
-        return 4;
-    }
-    else if ( enteredPassword == "finance" )
-    {
-        return 5;
-    }
-    else if ( enteredPassword == "sponsoring" )
-    {
-        return 6;
-    }
-    else if ( enteredPassword == "autre" )
-    {
-        return 0;
-    }
-    else {
-        return -1;
-    }
-}*/
