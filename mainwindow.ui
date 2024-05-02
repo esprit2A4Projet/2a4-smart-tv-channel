@@ -90,7 +90,7 @@ QTabBar::tab:!selected {
      <enum>QTabWidget::West</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_18">
      <attribute name="title">
@@ -5871,9 +5871,9 @@ color: white;</string>
  </widget>
  <resources>
   <include location="az.qrc"/>
-  <include location="tri.qrc"/>
   <include location="captures.qrc"/>
   <include location="cap.qrc"/>
+  <include location="tri.qrc"/>
  </resources>
  <connections/>
 </ui>
