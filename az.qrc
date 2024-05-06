@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>animation logo version finale.gif</file>
+        <file>Box login.png</file>
+        <file>couba.png</file>
+        <file>courbe.png</file>
+        <file>icone utlisateur.png</file>
+        <file>Identifiant unique _.png</file>
+        <file>logo en bas du box.png</file>
+        <file>Mot de passe _.png</file>
+        <file>S_authentifier.png</file>
+    </qresource>
+</RCC>

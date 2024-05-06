@@ -1,8 +1,10 @@
 Pending Items:
-to do
-aa
+maps
 
 Completed Items:
+crud
 sms
-stat
-historique
+gestion des versions
+toolbar
+pdf pie chart
+integration

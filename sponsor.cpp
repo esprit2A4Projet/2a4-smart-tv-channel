@@ -7,7 +7,6 @@
 #include <QTableWidget>
 #include <QDate>
 #include <QMessageBox>
-
 #include <QUrl>
 #include <QUrlQuery>
 #include <QNetworkRequest>
@@ -80,7 +79,7 @@ bool Sponsor::ajouter()
     QSqlQuery query;
     if (c.createconnect())
     {
-        return c.insertData(nom, budget, pack, date_deb, date_fin, telephone);
+        return c.insertDataS(nom, budget, pack, date_deb, date_fin, telephone);
     }
 
     return false;
@@ -93,6 +92,9 @@ void Sponsor::afficher(QTableWidget *tableWidget)
     QSqlQuery query(c.db);
     if (query.exec("SELECT * FROM SPONSOR"))
     {
+        tableWidget->clearContents(); // Clear existing content
+        tableWidget->setRowCount(0); // Reset row count
+
         tableWidget->setColumnCount(7);
         QStringList labels;
         labels <<"Id" << "Nom" << "Budget" << "Pack" << "Date debut" << "Date fin" << "Telephone";
@@ -131,6 +133,7 @@ void Sponsor::afficher(QTableWidget *tableWidget)
     c.db.close();
 }
 
+
 bool Sponsor::supprimer(int id)
 {
     QSqlQuery query;
@@ -165,7 +168,7 @@ bool Sponsor::modifier(int id_sponsor, const QString &nom, const QString &budget
     return true;
 }
 
-void Sponsor::rechercher(const QString &nomSponsor, QTableWidget *tableWidget)
+void Sponsor::rechercherS(const QString &nomSponsor, QTableWidget *tableWidget)
 {
     Connection c;
 
@@ -175,20 +178,32 @@ void Sponsor::rechercher(const QString &nomSponsor, QTableWidget *tableWidget)
 
     if (query.exec())
     {
-        tableWidget->clear(); // Clear existing content before populating with search results
-        tableWidget->setColumnCount(6);
-        tableWidget->setHorizontalHeaderLabels({"Nom", "Budget", "Pack", "Date debut", "Date fin", "Telephone"});
+        tableWidget->setColumnCount(7);
+        tableWidget->hideColumn(0);
+        tableWidget->setHorizontalHeaderLabels({"ID","Nom", "Budget", "Pack", "Date debut", "Date fin", "Telephone"});
 
         int RowNumber = 0;
+        bool sponsorFound = false; // Flag to track if the sponsor name is found in the database
         while (query.next())
         {
-            tableWidget->insertRow(RowNumber);
-            for (int col = 0; col < 6; ++col)
+            sponsorFound = true;
+            if (RowNumber >= tableWidget->rowCount()) {
+                tableWidget->insertRow(RowNumber);
+            }
+            for (int col = 0; col < 7; ++col)
             {
                 QTableWidgetItem *item = new QTableWidgetItem(query.value(col).toString());
                 tableWidget->setItem(RowNumber, col, item);
             }
             RowNumber++;
+        }
+
+        // Display a message if the sponsor name doesn't exist
+        if (!sponsorFound) {
+            QMessageBox::information(nullptr, "Information", "Aucun sponsor avec ce nom n'a été trouvé dans la base de données.");
+        } else {
+            // If sponsor found, resize the table to fit the contents
+            tableWidget->setRowCount(RowNumber);
         }
     }
     else
@@ -198,6 +213,7 @@ void Sponsor::rechercher(const QString &nomSponsor, QTableWidget *tableWidget)
 
     c.db.close();
 }
+
 
 
 
@@ -215,7 +231,7 @@ bool Sponsor::trierParPack(QTableWidget *tableWidget)
         tableWidget->sortByColumn(3, Qt::AscendingOrder);
 
             // Optional: You can reset the sorting mode if needed
-            // tableWidget->setSortingEnabled(false);
+            tableWidget->setSortingEnabled(false);
 
         c.db.close();
         return true;
@@ -224,6 +240,88 @@ bool Sponsor::trierParPack(QTableWidget *tableWidget)
     {
         c.db.close();
         return false;
+    }
+}
+
+bool Sponsor::trierParDateDeb(QTableWidget *tableWidget)
+{
+    Connection c;
+
+    QSqlQuery query(c.db);
+    query.prepare("SELECT * FROM SPONSOR ORDER BY DATE_DEB ASC");
+
+    if (query.exec())
+    {
+        tableWidget->setSortingEnabled(true);
+        tableWidget->sortByColumn(4, Qt::AscendingOrder); // Assuming DATE_DEB is in the 5th column (index 4)
+
+        // Optional: You can reset the sorting mode if needed
+         tableWidget->setSortingEnabled(false);
+
+        c.db.close();
+        return true;
+    }
+    else
+    {
+        c.db.close();
+        return false;
+    }
+}
+
+
+QString Sponsor::constructSMS(const QString& nomSponsor)
+{
+    Connection c;
+
+    QSqlQuery query(c.db);
+    query.prepare("SELECT * FROM SPONSOR WHERE NOM = :nomSponsor");
+    query.bindValue(":nomSponsor", nomSponsor);
+    if (!query.exec())
+    {
+        qDebug() << "Error construction: Failed to execute query";
+        c.db.close();
+        return ""; // Return empty message if query execution fails
+    }
+    else {
+    if (query.next())
+    {
+        QString message = "Cher " + query.value("NOM").toString() + ", j'espère que ce message vous convient.\n"
+                          "Nous sommes ravis de confirmer notre accord de parrainage pour INSIGHTIFY.\n"
+                          "Voici vos informations relatives :\n"
+                          "Votre budget est : " + query.value("BUDGET").toString() + "\n"
+                          "Votre pack est : " + query.value("PACK").toString() + "\n"
+                          "Date debut contrat : " + query.value("DATE_DEB").toString() + "\n"
+                          "Date fin contrat : " + query.value("DATE_FIN").toString() + "\n";
+        c.db.close();
+        return message;
+    } else
+    {
+        qDebug() << "Error: No sponsor found with the given name";
+        c.db.close();
+        return ""; // Return empty message if no sponsor found
+    }
+    }
+}
+
+
+bool Sponsor::sponsorExists(const QString& nomSponsor)
+{
+    Connection c;
+    QSqlQuery query(c.db);
+    query.prepare("SELECT COUNT(*) FROM SPONSOR WHERE NOM = :nomSponsor");
+    query.bindValue(":nomSponsor", nomSponsor);
+    if (!query.exec()) {
+        qDebug() << "Error existance: Failed to execute query";
+        return false; // Return false if query execution fails
+    }
+
+    // Check if any records were found
+    if (query.next()) {
+        int count = query.value(0).toInt();
+        return count > 0; // Return true if sponsor exists, false otherwise
+    } else {
+        qDebug() << "Error: Unable to retrieve result from query";
+        return false; // Return false if query result retrieval fails
     }
 }
 
@@ -254,9 +352,9 @@ void Sponsor::sendSMS(const QString& phoneNumber, const QString& message ) {
     // Handle the reply
     QObject::connect(reply, &QNetworkReply::finished, [=]() {
         if (reply->error() == QNetworkReply::NoError) {
-            QMessageBox::information(nullptr, "SMS Sent", "SMS sent successfully.");
+            QMessageBox::information(nullptr, "SMS envoye", "SMS envoyé avec succès.");
         } else {
-            QMessageBox::critical(nullptr, "SMS Error", "Failed to send SMS. Error: " + reply->errorString());
+            QMessageBox::critical(nullptr, "SMS erreur", "Échec de l'envoi du SMS. Erreur: " + reply->errorString());
         }
 
         // Clean up

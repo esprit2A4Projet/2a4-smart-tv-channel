@@ -15,11 +15,13 @@ CToDoList::CToDoList(QWidget *parent) : QWidget(parent)
 
     QGroupBox* groupBox = new QGroupBox("", this);
     groupBox->setStyleSheet("background-color: #ECF0F1");
+    groupBox->setMinimumSize(1000, 1000); // Set a minimum size for the group box
 
     QVBoxLayout* groupBoxLayout = new QVBoxLayout();
+    groupBoxLayout->setContentsMargins(20, 20, 20, 20); // Set margins for the layout
     groupBox->setLayout(groupBoxLayout);
 
-    QLabel* pwTitle = new QLabel("Dashboard", this);
+    QLabel* pwTitle = new QLabel("To Do List", this);
     pwTitle->setAlignment(Qt::AlignCenter);
     pwTitle->setStyleSheet("font-size: 30pt; margin: 10%;");
     groupBoxLayout->addWidget(pwTitle);
@@ -28,11 +30,11 @@ CToDoList::CToDoList(QWidget *parent) : QWidget(parent)
     groupBoxLayout->addLayout(pHLayoutLabels);
 
     QLabel* plblPending = new QLabel("En cours", this);
-    plblPending->setStyleSheet("font-size: 15pt;");
+    plblPending->setStyleSheet("font-size: 15pt; font-weight: bold; qproperty-alignment: AlignCenter;");
     pHLayoutLabels->addWidget(plblPending);
 
     QLabel* plblCompleted = new QLabel("Complété", this);
-    plblCompleted->setStyleSheet("font-size: 15pt;");
+    plblCompleted->setStyleSheet("font-size: 15pt; font-weight: bold; qproperty-alignment: AlignCenter;");
     pHLayoutLabels->addWidget(plblCompleted);
 
     QHBoxLayout* pHLayout = new QHBoxLayout();
@@ -59,21 +61,17 @@ CToDoList::CToDoList(QWidget *parent) : QWidget(parent)
     m_pwPending->setModel(new QStringListModel());
     m_pwCompleted->setModel(new QStringListModel());
 
-    m_pwPending->setStyleSheet
-    ("QListView { font-size: 20pt; font-weight: bold; }"
-     "QListView::item { background-color: #E74C3C; padding: 10%;"
-     "border: 1px solid #C0392B; }"
-     "QListView::item::hover { background-color: #C0392B }");
 
-    m_pwCompleted->setStyleSheet
-    ("QListView { font-size: 20pt; font-weight: bold; }"
-     "QListView::item { background-color: #2ECC71; padding: 10%;"
-     "border: 1px solid #27AE60; }"
-     "QListView::item::hover { background-color: #27AE60 }");
+    groupBox->setStyleSheet("background-image:url(:/tsawer/background.png);");  // Light background
 
+    pwTitle->setStyleSheet("font-size: 30pt; margin: 10%; font-family: Game Of Squids;");  // Improved font
+
+    m_pwPending->setStyleSheet("font-size: 20pt; font-weight: bold; font-family: Open Sans; background-color: #AFEEEE; padding: 5%; border: 1px solid rgb(255, 0, 0);");   // Blue for pending tasks
+    m_pwCompleted->setStyleSheet("font-size: 20pt; font-weight: bold; font-family: Open Sans; background-color: #2ECC71; padding: 5%; border: 1px solid #27AE60;"); // Green for completed tasks
 
     loadToDoListFromFile("todo_list.txt");
 }
+
 
 void CToDoList::onAdd(const QString& itemText)
 {

@@ -41,10 +41,12 @@ public:
     void afficher(QTableWidget *tableWidgetS);
     bool supprimer(int);
     bool modifier(int id_sponsor, const QString &nom, const QString &budget, const QString &pack, const QString &date_deb, const QString &date_fin, const QString &telephone);
-    void rechercher(const QString &nomSponsor, QTableWidget *tableWidget);
+    void rechercherS(const QString &nomSponsor, QTableWidget *tableWidget);
     bool trierParPack(QTableWidget *tableWidgetS);
     void sendSMS(const QString& phoneNumber , const QString& message );
-
+    QString constructSMS(const QString& nomSponsor);
+    bool sponsorExists(const QString& nomSponsor);
+    bool trierParDateDeb(QTableWidget *tableWidget);
 
 
 

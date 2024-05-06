@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/new/prefix4">
+        <file>map.qml</file>
+    </qresource>
+</RCC>

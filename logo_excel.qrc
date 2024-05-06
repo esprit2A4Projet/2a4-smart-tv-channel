@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>tsawer/logo pour excel.png</file>
+    </qresource>
+</RCC>
